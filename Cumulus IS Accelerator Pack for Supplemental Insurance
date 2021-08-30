@@ -1,0 +1,537 @@
+/* ----------- DO NOT EDIT BELOW ----------- */
+// ==UserScript==
+// @name         Cumulus IS Accelerator Pack for Supplemental Insurance D2C
+// @version      1.0
+// @author       Viral Patel, Scott Tallam
+// @description  Built on the work of Aaron Riley, Collin Kemble, and Bob Ullery, now everything is controlled with variables and includes a product catalog page
+// @match        http*://cumulusfinserv.herokuapp.com/*
+// @match        https://mc.*exacttarget.com/*
+// @match        https://*.marketingcloudapps.com/*
+// @match        https://*.evergage.com/*
+// @match        https://cumulusfsc.lightning.force.com/*
+// @exclude      https://*org62*/*
+// @require https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
+// @require https://gist.github.com/raw/2625891/waitForKeyElements.js
+// ==/UserScript==
+
+////Customer Company Info
+var companyName = "ABC Insurance";
+var companyURL = "abc.com"; // Do NOT include http, https, or www.
+
+
+////Cumulus Website Labels
+/***************************************************************
+ * Website: PRIMARY NAVIGATION: This is the Primary Page Navigation (Default is Banking, Credit Cards, Insurance, Investing, Loans, News).
+ ***************************************************************/
+var nav1 = "Accident"; //default: Banking
+var nav2 = "Cancer"; //default: Credit Cards
+var nav3 = "Critical Illness"; //default: Insurance
+var nav4 = "Dental"; //default: Investing
+var nav5 = "Hospital"; //default: Loans
+var nav6 = "Life"; //default: News
+
+/***************************************************************
+ * Website: DROP-DOWN MENU OPTION: Drop down menu item options under primary navigation option for "Banking".
+ ***************************************************************/
+var subNav1 ="Accident Overview"; //default: Banking Overview
+var subNav2 ="Accident 101"; //default: Standard Checking
+var subNav3 ="Accident + Hospital"; //default: Standard Savings
+var subNav4 ="Accident + Illness"; //default: Standard Checking + Savings
+
+/***************************************************************
+ * Website: HOME PAGE HERO BANNER
+ ***************************************************************/
+     /***** DEFAULT (AKA Non-Personalized)  *****/
+     var homepageHeroBannerImage = "https://image.s4.sfmc-content.com/lib/fe95157477610d7f76/m/1/e11360a7-2c66-4fc1-922e-200623576826.png"; //optional: Leave it blank if you don't want to update this image.
+     var homepageHeroBannerTitleLine1 = "Tackling unexpected"; //default: Life, it's one less
+     var homepageHeroBannerTitleLine2 = "medical expenses?"; //default: thing to worry about.
+     var homepageHeroBannerSubTitleLine1 = "Learn the value of"; //default: Open a free account with
+     var homepageHeroBannerSubTitleLine2 = "supplemental insurance"; //default: Cumulus today!
+     var homepageHeroBannerCTAButtonLabel = "LEARN MORE"; //default: Sign Up Now
+
+     /***** PERSONALIZED *****/
+     var homepageHeroBannerImagePersonalized = "https://image.s4.sfmc-content.com/lib/fe95157477610d7f76/m/1/257fea19-ec0d-46ad-9b2f-459c9286b575.jpg"; //optional: Leave it blank if you don't want to update this image.
+     var homepageHeroBannerTitleLine1Personalized = "Accidents happen. We can"; //default: Life, it's one less
+     var homepageHeroBannerTitleLine2Personalized = "help them hurt a little less."; //default: thing to worry about.
+     var homepageHeroBannerSubTitleLine1Personalized = "Here's how you can get accident"; //default: Open a free account with
+     var homepageHeroBannerSubTitleLine2Personalized = "insurance with us."; //default: Cumulus today!
+     var homepageHeroBannerCTAButtonLabelPersonalized = "REQUEST A QUOTE"; //default: Sign Up Now
+
+/***************************************************************
+ * Website: HOME PAGE INTRO PARAGRAPH (UNDER BANNER)
+ ***************************************************************/
+var homepageIntroParaTitle = "Are you prepared to cover unplanned out-of-pocket costs?"; //default: Life simplified.
+var homepageIntroParaDetail = "Most Americans have less than $1,000 to spend on out-of-pocket expenses. When the unexpected health care costs like these come your way, we're there. See how we can meet your needs.";
+var homepageIntroParaCTAButtonLabel = "GET A QUOTE"; //default: Sign Up for an Account
+
+/***************************************************************
+ * Website: HOME PAGE PRODUCT CATEGORIES UNDER INTRO PARAGRAPH
+ ***************************************************************/
+var homepageProductCategory1Title = "Accident"; //default: Checking
+var homepageProductCategory1Detail = "Get peace of mind and help paying for emergency treatment."; //default: Thousands of ATMS and branches, plus absolutely no fees.
+var homepageProductCategory2Title = "Critical Illness"; //default: Savings
+var homepageProductCategory2Detail = "Get help with the cost of treating covered critical illness.";
+var homepageProductCategory3Title = "Cancer"; //default: Credit Cards
+var homepageProductCategory3Detail = "Get help coping with the financial and emotional effects of cancer.";
+var homepageProductCategory4Title = "Hospital"; //default: Borrowing
+var homepageProductCategory4Detail = "Help keep high deductibles from derailing your life plans.";
+var homepageProductCategory5Title = "Dental"; //default: Investing
+var homepageProductCategory5Detail = "Various dental coverage options for the level and premiums that are right for you.";
+
+/***************************************************************
+ * Website: HOME PAGE RECOMMENDATIONS (Personalized)
+ ***************************************************************/
+var homepageRecommendationsHeader = "Need more information?";
+var homepageRecommendations1Image = "https://image.s4.sfmc-content.com/lib/fe95157477610d7f76/m/1/14da0d51-6790-48b9-a577-91cfd7cb1f98.jpeg"; //optional: Leave it blank if you don't want to update this image.
+var homepageRecommendations1Title = "What is Accident Insurance";
+var homepageRecommendations1Detail = "Here's what an accident insurance plan covers and how it can help you get back on your feet quicker.";
+var homepageRecommendations1CTALabel = "Learn More";
+
+var homepageRecommendations2Image = ""; //optional: Leave it blank if you don't want to update this image.
+var homepageRecommendations2Title = "Guide to Accident Insurance";
+var homepageRecommendations2Detail = "Accient insurance is a type of supplimental insurance that pays cash benefit that helps cover the costs of treating an accidental injury.";
+var homepageRecommendations2CTALabel = "Learn More";
+
+var homepageRecommendations3Image = ""; //optional: Leave it blank if you don't want to update this image.
+var homepageRecommendations3Title = "Cost Calculator";
+var homepageRecommendations3Detail = "How prepared ar you to cover unplanned out of pocket costs?";
+var homepageRecommendations3CTALabel = "Calculator";
+
+var homepageRecommendations4Image = ""; //optional: Leave it blank if you don't want to update this image.
+var homepageRecommendations4Title = "Adventure Travel and Accidents";
+var homepageRecommendations4Detail = "More Americans are seeking adventure when they vacation, leading to injuries.";
+var homepageRecommendations4CTALabel = "Learn More";
+
+
+/***************************************************************
+ * Website: PRODUCT PAGE VIEW (FORMERLY BANKING > STANDARD CHECKING) - FIRST PRODUCT PAGE UNDER FIRST TOP NAV ITEM.
+ ***************************************************************/
+var productPageMainImage = "https://image.s4.sfmc-content.com/lib/fe33117276640479701677/m/1/4995cc26-06e2-49b5-97f0-474807299d4d.png"; //optional: Leave it blank if you don't want to update this image.
+var productPageIntroPara = "Life can change in a second. Be ready."; //default: Make your financial life simpler.
+var productPageCTALabel = "Request a Quote"; //default: Open an Account
+var productPageFeatureBullet1 = "You are cleaning your gutters when the ladder slips and you fall off."; //default: Free transactions at over 7,200 ATMS
+var productPageFeatureBullet2 = "The physician visit and x-ray in the ER reveals a dislocated hip and broken wrist."; //default: Unlimited check-writing
+var productPageFeatureBullet3 = "Cash benefits are paid directly to you, helping ease the financial stress of your accident."; //default: Bonus rates on select CDs and IRA CDs
+var productPageFeatureBullet4 = "Claims made on your Accident policy are paid fast, so unexpected bills don't have to leave you sidelined."; //default: Free Overdraft Protection setup and transfers
+var productPageRequirementBullet1 = "Starting at $25 month"; //default: $2,000 or greater, total qualifying direct ...
+var productPageRequirementBullet2 = "Based on avg. annual premium of $3,999.44 for Individual coverage"; //default: OR, $2,000 average monthly balance ...
+var productPageRequirementBullet3 = "For a policyholder aged 18-64"; //default: OR, $15,000 combined average monthly ...
+var productPageService1 = "It's paid directly to you."; //default: Direct Deposit
+var productPageService2 = "An accident insurance plan pays you directly in cash without any deductible or extra waiting time after your claim is verified."; //default: Sign up to have your payroll, pension ...
+var productPageService3 = "Take advantage of our flexible rainy day fund."; //default: Overdraft Protection
+var productPageService4 = "Our Rainy Day Fund is standard on all plans. Start each year with up to $500 in the fund that we use to pay claims that would otherwise be denied due to certain limitations."; //default: Safeguard your checking account ...
+var productPageDetails1 = "Starting at"; //default: Minimum Deposit
+var productPageDetails2 = "$25.00 a month"; //default: $25
+var productPageDetails3 = "Average Annual Premium"; //default: Monthly Service Charge
+var productPageDetails4 = "$349.44"; //default: $15 if the minimum deposit is not met
+var productPageDetails5 = "Estimate Based on"; //default: ATM Fees
+var productPageDetails6 = "Individual coverage for a policy holder aged 18 to 64"; //default: $0 per transaction at Cumulus Bank ATMs
+
+
+/***************************************************************
+ * IS: PERSONA INFORMATION FOR IS USER PROFILE
+ ***************************************************************/
+var personaName = "Rachel Morris";
+var personaEmail = "rmorris555@gmail.com";
+var personaCity = "Cleveland, OH";
+var personaLTV = "$1,400";
+var personaAOV = "$350";
+var personaOrders = "4";
+
+/***************************************************************
+ * IS: AFFINITY WHEEL
+ ***************************************************************/
+     /***** TOP RIGHT  *****/
+     var topRightLabel = "CHANNEL";
+     var topRightLine1 = "Web";
+     var topRightLine2 = "Email";
+     var topRightLine3 = "Push";
+     var topRightLine4 = "SMS";
+
+     /***** BOTTOM RIGHT  *****/
+     var bottomRightLabel = "KEYWORDS";
+     var bottomRightLine1 = "Coverage";
+     var bottomRightLine2 = "Unexpected";
+     var bottomRightLine3 = "Calculator";
+     var bottomRightLine4 = "Quote";
+
+     /***** BOTTOM LEFT  *****/
+     var bottomLeftLabel = "PRODUCTS";
+     var bottomLeftLine1 = "Dental";
+     var bottomLeftLine2 = "Hospital";
+     var bottomLeftLine3 = "Citical Illness";
+     var bottomLeftLine4 = "Accident";
+
+     /***** TOP LEFT  *****/
+     var topLeftLabel = "CATEGORY";
+     var topLeftLine1 = "Individuals";
+     var topLeftLine2 = "Businesses";
+     var topLeftLine3 = "Advice";
+     var topLeftLine4 = "Claims";
+
+/***************************************************************
+ * IS: PRODUCT INFORMATION FOR PRODUCT TIME LINE
+ ***************************************************************/
+////Product Info - https://interactionstudio.evergage.com/ui/index.html#/dataset/nto/catalog/itemEdit?itemType=Product&itemId=2040247&timeRange=pastWeek
+var product1name = "Accident - Get help with high deductible for covered hospital stays.";
+var product1image = "https://image.s4.sfmc-content.com/lib/fe33117276640479701677/m/1/4995cc26-06e2-49b5-97f0-474807299d4d.png";
+var product1url = "https://image.s4.sfmc-content.com/lib/fe33117276640479701677/m/1/4995cc26-06e2-49b5-97f0-474807299d4d.png";
+var product1description = "Get help with high deductible for covered hospital stays.";
+var product1price = "25.98";
+var product1listprice = "25.99";
+var product1subcatTag1 = "Insurance";
+var product1subcatTag2 = "Supplemental";
+var product1subcatTag3 = "Accident";
+var product1styleTag1 = "Insurance";
+var product1styleTag2 = "Accident";
+var product1categoryTag1 = "Accident | Personal | Supplimental";
+
+////Product Recs
+var productRec1image = "https://image.s4.sfmc-content.com/lib/fe33117276640479701677/m/1/4995cc26-06e2-49b5-97f0-474807299d4d.png";
+var productRec2image = "https://image.s4.sfmc-content.com/lib/fe33117276640479701677/m/1/1b21859c-9890-4149-b5fa-433e983a49dd.png";
+var productRec3image = "https://image.s4.sfmc-content.com/lib/fe33117276640479701677/m/1/fee6b9cf-696a-432f-a04f-24c3c47b2747.png";
+var productRec4image = "https://image.s4.sfmc-content.com/lib/fe33117276640479701677/m/1/101ed191-ee04-4151-ac2a-5e4276eb9b47.png";
+
+/***************************************************************
+ * IS: EVENT STREAM
+ ***************************************************************/
+     /***** ANONYMOUS EVENTS  *****/
+     var event1 = "Viewed: Homepage";
+     var event2 = "Viewed: Personal Insurance";
+     var event3 = "Viewed: Accident Insurance";
+     var event4 = "Viewed: Hospital Insurance";
+
+     /***** KNOWN (POST ID) EVENTS  *****/
+     var event5 = "Quote Abandoned Online";
+     var event6 = "Open - Abandoned Quote Email";
+
+var replaceArry = [
+    [/cumulusfinserv.herokuapp.com/gi,companyURL],
+    [/cumulusfinserv.com/gi,companyURL],
+    [/Cumulus Financial/gi,companyName],
+    [/Cumulus/gi,companyName],
+    [/Average Order Value/gi, "Average Premium"],
+    [/Orders/gi, "Annual Renewals"],
+];
+
+
+function addGlobalStyle(css) {
+   var head, style;
+   head = document.getElementsByTagName('head')[0];
+   if (!head) { return; }
+   style = document.createElement('style');
+   style.type = 'text/css';
+   style.innerHTML = css;
+   head.appendChild(style);
+}
+//addGlobalStyle('.gender-affinities { display: none; }');
+//addGlobalStyle('#pdp-promo3 { background-image: url("https://image.s4.sfmc-content.com/lib/fe36117276640479751c73/m/1/f4cddb17-a257-42df-8148-69830cab2e48.png");  height: 314px; width: 1036px; margin: 0 auto; }');
+
+var numTerms    = replaceArry.length;
+var transTimer  = setInterval (translateTermsOnPage, 222);
+
+function translateTermsOnPage () {
+    var txtWalker   = document.createTreeWalker (
+        document.body,
+        NodeFilter.SHOW_TEXT, {
+            acceptNode: function (node) {
+                if (node.nodeValue.trim() ) {
+                    if (node.tmWasProcessed)
+                        return NodeFilter.FILTER_SKIP;
+                    else
+                        return NodeFilter.FILTER_ACCEPT;
+                }
+                return NodeFilter.FILTER_SKIP;
+            }
+        },
+        false
+    );
+    var txtNode     = null;
+    while (txtNode  = txtWalker.nextNode()) {
+        txtNode.nodeValue       = replaceAllTerms (txtNode.nodeValue);
+        txtNode.tmWasProcessed  = true;
+    }
+    var placeholderNodes = document.querySelectorAll ("[placeholder]");
+}
+
+function replaceAllTerms (oldTxt) {
+    for (var J  = 0;  J < numTerms;  J++) {
+        oldTxt  = oldTxt.replace (replaceArry[J][0], replaceArry[J][1]);
+    }
+    return oldTxt;
+}
+
+
+var $ = window.jQuery;
+$(document).ready(function () {
+    let checkFunction = function(){
+       if($('.navbar-header').length > 0){
+           //document.getElementById("side-bar-nav").style = "background-color:#E8E5DE;";
+           clearInterval(this);
+       }
+    }
+    var checkForLogoInterval = setInterval(checkFunction, 200);
+
+    function replaceContent () {
+
+        //product page
+        if($('#pageExceptFooter .breadcrumb li:eq(0) span').html() == "Catalog"){
+            document.title = product1name;
+        }
+
+        var isPersonalized = false;
+        if($("#is-personalized-experience").length){
+            isPersonalized = true;
+        }
+
+        /***************************************************************
+         * PRIMARY NAVIGATION: This is the Primary Page Navigation (Default is Banking, Credit Cards, Insurance, Investing, Loans, News).
+         ***************************************************************/
+        $('#nav-personal-banking > span').html(nav1);
+        $('#nav-credit-cards > span').html(nav2);
+        $('#nav-personal-insurance > span').html(nav3);
+        $('#nav-personal-investing > span').html(nav4);
+        $('#nav-personal-borrowing > span').html(nav5);
+        $('#nav-personal-news').html(nav6);
+
+        /***************************************************************
+         * DROP-DOWN MENU OPTION: Drop down menu item options under primary navigation option for "Banking".
+         ***************************************************************/
+        $('#personal-banking > ul > li:nth-child(1) > a').html(subNav1);
+        $('#personal-banking > ul > li:nth-child(3) > a').html(subNav2);
+        $('#personal-banking > ul > li:nth-child(4) > a').html(subNav3);
+        $('#personal-banking > ul > li:nth-child(5) > a').html(subNav4);
+
+        /***************************************************************
+         * HOME PAGE HERO BANNER - DEFAULT (AKA Non-Personalized)
+         ***************************************************************/
+        var homepageHeroBannerDimensions = "height: 500px; width:1170px;";
+        if(isPersonalized){
+            homepageHeroBannerImage = homepageHeroBannerImagePersonalized;
+            homepageHeroBannerTitleLine1 = homepageHeroBannerTitleLine1Personalized;
+            homepageHeroBannerTitleLine2 = homepageHeroBannerTitleLine2Personalized
+            homepageHeroBannerSubTitleLine1 = homepageHeroBannerSubTitleLine1Personalized;
+            homepageHeroBannerSubTitleLine2 = homepageHeroBannerSubTitleLine2Personalized;
+            homepageHeroBannerCTAButtonLabel = homepageHeroBannerCTAButtonLabelPersonalized;
+            homepageHeroBannerDimensions = "height: 393px; width:1170px;";
+        }
+        if(homepageHeroBannerImage.trim()){
+           $('#hp-banner-image').attr("src", homepageHeroBannerImage);
+           $('#hp-banner-image').attr("style", homepageHeroBannerDimensions);
+        }
+        $('#hp-banner-title1').html(homepageHeroBannerTitleLine1);
+        $('#hp-banner-title2').html(homepageHeroBannerTitleLine2);
+        $('#hp-banner-subtitle1').html(homepageHeroBannerSubTitleLine1);
+        $('#hp-banner-subtitle2').html(homepageHeroBannerSubTitleLine2);
+        $('#hp-banner-cta').html(homepageHeroBannerCTAButtonLabel);
+
+        /***************************************************************
+         * HOME PAGE INTRO PARAGRAPH (UNDER BANNER) - DEFAULT (AKA Non-Personalized)
+         ***************************************************************/
+        $('#hp-intro-para-title').html(homepageIntroParaTitle);
+        $('#hp-intro-para-detail').html(homepageIntroParaDetail);
+        $('#hp-intro-para-cta').html(homepageIntroParaCTAButtonLabel);
+
+        /***************************************************************
+         * HOME PAGE PRODUCT CATEGORIES UNDER INTRO PARAGRAPH - DEFAULT (AKA Non-Personalized)
+         ***************************************************************/
+        $('#hp-product-category-1 > h4 > a').html(homepageProductCategory1Title);
+        $('#hp-product-category-1 > p').html(homepageProductCategory1Detail);
+        $('#hp-product-category-2 > h4 > a').html(homepageProductCategory2Title);
+        $('#hp-product-category-2 > p').html(homepageProductCategory2Detail);
+        $('#hp-product-category-3 > h4 > a').html(homepageProductCategory3Title);
+        $('#hp-product-category-3 > p').html(homepageProductCategory3Detail);
+        $('#hp-product-category-4 > h4 > a').html(homepageProductCategory4Title);
+        $('#hp-product-category-4 > p').html(homepageProductCategory4Detail);
+        $('#hp-product-category-5 > h4 > a').html(homepageProductCategory5Title);
+        $('#hp-product-category-5 > p').html(homepageProductCategory5Detail);
+
+        /***************************************************************
+         * HOME PAGE RECOMMENDATIONS (Personalized)
+         ***************************************************************/
+        if(isPersonalized){
+            $('#hp-blog-recommendations-title').html(homepageRecommendationsHeader);
+            if(homepageRecommendations1Image.trim()){
+                $('#hp-blog-0-image-div').css("background-image","url("+homepageRecommendations1Image+")");
+            }
+            $('#hp-blog-0-title').html(homepageRecommendations1Title);
+            $('#hp-blog-0-detail').html(homepageRecommendations1Detail);
+            $('#hp-blog-0-cta-label').html(homepageRecommendations1CTALabel);
+
+            if(homepageRecommendations2Image.trim()){
+                $('#hp-blog-1-image-div').css("background-image","url("+homepageRecommendations2Image+")");
+            }
+            $('#hp-blog-1-title').html(homepageRecommendations2Title);
+            $('#hp-blog-1-detail').html(homepageRecommendations2Detail);
+            $('#hp-blog-1-cta-label').html(homepageRecommendations2CTALabel);
+
+            if(homepageRecommendations3Image.trim()){
+                $('#hp-blog-2-image-div').css("background-image","url("+homepageRecommendations3Image+")");
+            }
+            $('#hp-blog-2-title').html(homepageRecommendations3Title);
+            $('#hp-blog-2-detail').html(homepageRecommendations3Detail);
+            $('#hp-blog-2-cta-label').html(homepageRecommendations3CTALabel);
+
+            if(homepageRecommendations4Image.trim()){
+                $('#hp-blog-3-image-div').css("background-image","url("+homepageRecommendations4Image+")");
+            }
+            $('#hp-blog-3-title').html(homepageRecommendations4Title);
+            $('#hp-blog-3-detail').html(homepageRecommendations4Detail);
+            $('#hp-blog-3-cta-label').html(homepageRecommendations4CTALabel);
+        }
+
+        /***************************************************************
+         * PRODUCT PAGE VIEW (FORMERLY BANKING > STANDARD CHECKING) - FIRST PRODUCT PAGE UNDER FIRST TOP NAV ITEM.
+         ***************************************************************/
+        if(window.location.pathname.indexOf("/banking/standard-checking") > -1){
+            if(productPageMainImage.trim()){
+                $('.pdp-img-responsive').attr("src", productPageMainImage);
+            }
+            $('body > div.container.product-intro > div > div.col-md-8 > h1').html(subNav2);
+            $('body > div.container.product-intro > div > div.col-md-8 > h3').html(productPageIntroPara);
+            $('body > div.container.product-intro > div > div.col-md-8 > a').html(productPageCTALabel);
+            $('body > div.container.product-details > div > div.col-md-8 > h3').html(subNav2+" Benefits");
+            $('body > div.container.product-details > div > div.col-md-8 > div > div:nth-child(1) > ul > li:nth-child(1)').html(productPageFeatureBullet1);
+            $('body > div.container.product-details > div > div.col-md-8 > div > div:nth-child(1) > ul > li:nth-child(2)').html(productPageFeatureBullet2);
+            $('body > div.container.product-details > div > div.col-md-8 > div > div:nth-child(1) > ul > li:nth-child(3)').html(productPageFeatureBullet3);
+            $('body > div.container.product-details > div > div.col-md-8 > div > div:nth-child(1) > ul > li:nth-child(4)').html(productPageFeatureBullet4);
+            $('body > div.container.product-details > div > div.col-md-8 > div > div:nth-child(2) > div > ul > li:nth-child(1)').html(productPageRequirementBullet1);
+            $('body > div.container.product-details > div > div.col-md-8 > div > div:nth-child(2) > div > ul > li:nth-child(2)').html(productPageRequirementBullet2);
+            $('body > div.container.product-details > div > div.col-md-8 > div > div:nth-child(2) > div > ul > li:nth-child(3)').html(productPageRequirementBullet3);
+            $('body > div.container.product-details > div > div.col-md-8 > h4').html(subNav2+" Services");
+            $('body > div.container.product-details > div > div.col-md-8 > p:nth-child(4)').html("<strong>"+productPageService1+"</strong> "+productPageService2);
+            $('body > div.container.product-details > div > div.col-md-8 > p:nth-child(5)').html("<strong>"+productPageService3+"</strong> "+productPageService4);
+            $('body > div.container.product-details > div > div.col-md-4.sidebar > h4').html(subNav2+" Details");
+            $('body > div.container.product-details > div > div.col-md-4.sidebar > h5:nth-child(2)').html(productPageDetails1);
+            $('body > div.container.product-details > div > div.col-md-4.sidebar > p:nth-child(3)').html(productPageDetails2);
+            $('body > div.container.product-details > div > div.col-md-4.sidebar > h5:nth-child(4)').html(productPageDetails3);
+            $('body > div.container.product-details > div > div.col-md-4.sidebar > p:nth-child(5)').html(productPageDetails4);
+            $('body > div.container.product-details > div > div.col-md-4.sidebar > h5:nth-child(6)').html(productPageDetails5);
+            $('body > div.container.product-details > div > div.col-md-4.sidebar > p:nth-child(7)').html(productPageDetails6);
+        }
+
+        $('#pageExceptFooter .breadcrumb li:eq(2)').html(product1name);
+        $('.page-header .col-sm-6 h2').html(product1name);
+        $('input#name').val(product1name);
+        $('input#imageUrl').val(product1image);
+        $('input#url').val(product1url);
+        $('.form-group .itemImage').attr("src", product1image);
+        $('textarea#description').val(product1description);
+        $('input#price').val(product1price);
+        $('input#listPrice').val(product1listprice);
+        $('tags-input:eq(0) li.ng-scope:eq(0)').html(product1subcatTag1 + "<a class='remove-button ng-binding ng-scope' ng-click='$removeTag()' ng-bind='::$$removeTagSymbol'>×</a>");
+        $('tags-input:eq(0) li.ng-scope:eq(1)').html(product1subcatTag2 + "<a class='remove-button ng-binding ng-scope' ng-click='$removeTag()' ng-bind='::$$removeTagSymbol'>×</a>");
+        $('tags-input:eq(0) li.ng-scope:eq(2)').html(product1subcatTag3 + "<a class='remove-button ng-binding ng-scope' ng-click='$removeTag()' ng-bind='::$$removeTagSymbol'>×</a>");
+        $('tags-input:eq(2) li.ng-scope:eq(0)').html(product1styleTag1 + "<a class='remove-button ng-binding ng-scope' ng-click='$removeTag()' ng-bind='::$$removeTagSymbol'>×</a>");
+        $('tags-input:eq(2) li.ng-scope:eq(1)').html(product1styleTag2 + "<a class='remove-button ng-binding ng-scope' ng-click='$removeTag()' ng-bind='::$$removeTagSymbol'>×</a>");
+        $('tags-input:eq(4) li.ng-scope:eq(0)').html(product1categoryTag1 + "<a class='remove-button ng-binding ng-scope' ng-click='$removeTag()' ng-bind='::$$removeTagSymbol'>×</a>");
+        //product recs simulation
+         $('.k-widget li.selection-preview img:eq(0)').attr("src", product1image);
+         $('.k-widget h3.item-name').html(product1name);
+         $('#highcharts-8 .highcharts-axis-labels text:eq(0) tspan').html(topLeftLine1);
+         $('#highcharts-8 .highcharts-axis-labels text:eq(1) tspan').html(topLeftLine2);
+         $('#highcharts-8 .highcharts-axis-labels text:eq(2) tspan').html(topLeftLine3);
+         $('#highcharts-8 .highcharts-axis-labels text:eq(3) tspan').html(topLeftLine4);
+         $('#highcharts-4 .highcharts-axis-labels text:eq(0) tspan').html(topLeftLine1);
+         $('#highcharts-4 .highcharts-axis-labels text:eq(1) tspan').html(topLeftLine2);
+         $('#highcharts-4 .highcharts-axis-labels text:eq(2) tspan').html(topLeftLine3);
+         $('#highcharts-4 .highcharts-axis-labels text:eq(3) tspan').html(topLeftLine4);
+         $('#highcharts-0 .highcharts-axis-labels text:eq(0) tspan').html(topLeftLine1);
+         $('#highcharts-0 .highcharts-axis-labels text:eq(1) tspan').html(topLeftLine2);
+         $('#highcharts-0 .highcharts-axis-labels text:eq(2) tspan').html(topLeftLine3);
+         $('#highcharts-0 .highcharts-axis-labels text:eq(3) tspan').html(topLeftLine4);
+         $('#highcharts-12 .highcharts-axis-labels text:eq(0) tspan').html(topLeftLine1);
+         $('#highcharts-12 .highcharts-axis-labels text:eq(1) tspan').html(topLeftLine2);
+         $('#highcharts-12 .highcharts-axis-labels text:eq(2) tspan').html(topLeftLine3);
+         $('#highcharts-12 .highcharts-axis-labels text:eq(3) tspan').html(topLeftLine4);
+
+         $('.recommendations:eq(0) img:eq(0)').attr("src", productRec1image);
+         $('.recommendations:eq(0) img:eq(1)').attr("src", productRec2image);
+         $('.recommendations:eq(0) img:eq(2)').attr("src", productRec3image);
+         $('.recommendations:eq(0) img:eq(3)').attr("src", productRec4image);
+         $('.recommendations:eq(1) img:eq(0)').attr("src", productRec3image);
+         $('.recommendations:eq(1) img:eq(1)').attr("src", productRec2image);
+         $('.recommendations:eq(1) img:eq(2)').attr("src", productRec1image);
+         $('.recommendations:eq(1) img:eq(3)').attr("src", productRec4image);
+         $('.recommendations:eq(2) img:eq(0)').attr("src", productRec1image);
+         $('.recommendations:eq(2) img:eq(1)').attr("src", productRec3image);
+         $('.recommendations:eq(2) img:eq(2)').attr("src", productRec2image);
+         $('.recommendations:eq(2) img:eq(3)').attr("src", productRec4image);
+
+         $('.recommendations:eq(3) img:eq(0)').attr("src", productRec1image);
+         $('.recommendations:eq(3) img:eq(1)').attr("src", productRec2image);
+         $('.recommendations:eq(3) img:eq(2)').attr("src", productRec3image);
+         $('.recommendations:eq(3) img:eq(3)').attr("src", productRec4image);
+        //profile page - Metrics Summary
+
+        $('h2.userLocation span').html(personaCity);
+        if($('#userDetail > div.userDetailTopPane > div.userDetailRow.ng-isolate-scope > div > div.loaded-content > ng-transclude > div.left-col.ng-scope > h1').html().indexOf("User from") < 0 ){
+            //persona info
+           $('.userDisplayName').html(personaName);
+           $('.customer-details tr:eq(0) td:eq(1)').html(personaEmail);
+           $('.customer-details tr:eq(1) td:eq(1)').html(personaName);
+           $('.customer-details tr:eq(2) td:eq(1)').html(personaEmail);
+           $('.customer-details tr:eq(4) td:eq(1)').html(personaLTV);
+           $('.metrics-summary .panel-wrapper:eq(0) .panel-header').html(personaLTV);
+           $('.metrics-summary .panel-wrapper:eq(1) .panel-header').html(personaOrders);
+           $('.metrics-summary .panel-wrapper:eq(2) .panel-header').html(personaAOV);
+            //Event Stream
+           $('.eventStreamTable .rightPreviewPane tr:eq(3) td:eq(1) a').html(personaEmail);
+           $('#eventGrid div:eq(2) tr:eq(0) td:eq(0) ').html("A few seconds ago");
+           $('#eventGrid div:eq(2) tr:eq(1) td:eq(0) ').html("A few seconds ago");
+           $('#eventGrid div:eq(2) tr:eq(2) td:eq(0) ').html("A few seconds ago");
+           $('#eventGrid div:eq(2) tr:eq(3) td:eq(0) ').html("A few seconds ago");
+           $('#eventGrid div:eq(2) tr:eq(4) td:eq(0) ').html("A few seconds ago");
+           $('#eventGrid div:eq(2) tr:eq(5) td:eq(0) ').html("A few seconds ago");
+           $('#eventGrid div:eq(2) tr:eq(0) td:eq(1) ').html(event6);
+           $('#eventGrid div:eq(2) tr:eq(1) td:eq(1) ').html(event5);
+           $('#eventGrid div:eq(2) tr:eq(2) td:eq(1) ').html(event4);
+           $('#eventGrid div:eq(2) tr:eq(3) td:eq(1) ').html(event3);
+           $('#eventGrid div:eq(2) tr:eq(4) td:eq(1) ').html(event2);
+           $('#eventGrid div:eq(2) tr:eq(5) td:eq(1) ').html(event1);
+        } else {
+           $('.userDisplayName').html("User from");
+           $('.customer-details tr:eq(1) td:eq(1)').html("User from " + personaCity);
+           $('.customer-details tr:eq(5) td:eq(1)').html("Just now");
+            //Event Stream
+           $('#eventGrid div:eq(2) tr:eq(0) td:eq(0) ').html("A few seconds ago");
+           $('#eventGrid div:eq(2) tr:eq(1) td:eq(0) ').html("A few seconds ago");
+           $('#eventGrid div:eq(2) tr:eq(2) td:eq(0) ').html("A few seconds ago");
+           $('#eventGrid div:eq(2) tr:eq(3) td:eq(0) ').html("A few seconds ago");
+           $('#eventGrid div:eq(2) tr:eq(0) td:eq(1) ').html(event4);
+           $('#eventGrid div:eq(2) tr:eq(1) td:eq(1) ').html(event3);
+           $('#eventGrid div:eq(2) tr:eq(2) td:eq(1) ').html(event2);
+           $('#eventGrid div:eq(2) tr:eq(3) td:eq(1) ').html(event1);
+           $('#eventGrid div:eq(2) tr').slice(4,20).html("");
+        }
+        $('.customer-details tr:eq(6) td:eq(1)').html("Just now");
+        //profile page - affinity wheel
+
+        $('#egAffinityQuadrantsChart .highcharts-container text:eq(0) textpath').html(topRightLabel);
+        $('#highChartsQuadrantCharts #topRight g.highcharts-axis-labels text:eq(0) tspan').html(topRightLine1);
+        $('#highChartsQuadrantCharts #topRight g.highcharts-axis-labels text:eq(1) tspan').html(topRightLine2);
+        $('#highChartsQuadrantCharts #topRight g.highcharts-axis-labels text:eq(2) tspan').html(topRightLine3);
+        $('#highChartsQuadrantCharts #topRight g.highcharts-axis-labels text:eq(3) tspan').html(topRightLine4);
+        $('#egAffinityQuadrantsChart .highcharts-container text:eq(1) textpath').html(bottomRightLabel);
+        $('#highChartsQuadrantCharts #bottomRight g.highcharts-axis-labels text:eq(0) tspan').html(bottomRightLine1);
+        $('#highChartsQuadrantCharts #bottomRight g.highcharts-axis-labels text:eq(1) tspan').html(bottomRightLine2);
+        $('#highChartsQuadrantCharts #bottomRight g.highcharts-axis-labels text:eq(2) tspan').html(bottomRightLine3);
+        $('#highChartsQuadrantCharts #bottomRight g.highcharts-axis-labels text:eq(3) tspan').html(bottomRightLine4);
+        $('#egAffinityQuadrantsChart .highcharts-container text:eq(2) textpath').html(bottomLeftLabel);
+        $('#highChartsQuadrantCharts #bottomLeft g.highcharts-axis-labels text:eq(0) tspan').html(bottomLeftLine1);
+        $('#highChartsQuadrantCharts #bottomLeft g.highcharts-axis-labels text:eq(1) tspan').html(bottomLeftLine2);
+        $('#highChartsQuadrantCharts #bottomLeft g.highcharts-axis-labels text:eq(2) tspan').html(bottomLeftLine3);
+        $('#highChartsQuadrantCharts #bottomLeft g.highcharts-axis-labels text:eq(3) tspan').html(bottomLeftLine4);
+        $('#egAffinityQuadrantsChart .highcharts-container text:eq(3) textpath').html(topLeftLabel);
+        $('#highChartsQuadrantCharts #topLeft g.highcharts-axis-labels text:eq(0) tspan').html(topLeftLine1);
+        $('#highChartsQuadrantCharts #topLeft g.highcharts-axis-labels text:eq(1) tspan').html(topLeftLine2);
+        $('#highChartsQuadrantCharts #topLeft g.highcharts-axis-labels text:eq(2) tspan').html(topLeftLine3);
+        $('#highChartsQuadrantCharts #topLeft g.highcharts-axis-labels text:eq(3) tspan').html(topLeftLine4);
+        //profile page - products
+        $('.rightPreviewPane .vrow img').attr("src", product1image);
+        $('.rightPreviewPane .vrow .itemName').html(product1name);
+        $('.rightPreviewPane .vrow .purchaseValue').html(product1price);
+        $('.rightPreviewPane .vrow .purchaseDetails:eq(1)').html("$"+product1price + " Each");
+    }
+    var imgTimer = setInterval(replaceContent, 200);
+})();
