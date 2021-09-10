@@ -1,11 +1,11 @@
 /* ----------- DO NOT EDIT BELOW ----------- */
 // ==UserScript==
-// @name         Cumulus IS Accelerator Pack for Supplemental Insurance D2C
+// @name         IS Accelerator - Supplemental Insurance for Cumulus
 // @version      1.0
 // @author       Viral Patel, Scott Tallam
 // @description  Built on the work of Aaron Riley, Collin Kemble, and Bob Ullery, now everything is controlled with variables and includes a product catalog page
 // @match        http*://cumulusfinserv.herokuapp.com/*
-// @match        https://mc.*exacttarget.com/*
+// @match        https://*.exacttarget.com/*
 // @match        https://*.marketingcloudapps.com/*
 // @match        https://*.evergage.com/*
 // @match        https://cumulusfsc.lightning.force.com/*
@@ -13,7 +13,7 @@
 // @require https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @require https://gist.github.com/raw/2625891/waitForKeyElements.js
 // ==/UserScript==
-
+var logFlag = 0;
 ////Customer Company Info
 var companyName = "Cumulus";
 var companyURL = "cumulusfinserv.com"; // Do NOT include http, https, or www.
@@ -36,7 +36,7 @@ var nav6 = "Life"; //default: News
  * Website: DROP-DOWN MENU OPTION: Drop down menu item options under primary navigation option for "Banking".
  ***************************************************************/
 var subNav1 ="Accident Overview"; //default: Banking Overview
-var subNav2 ="Accident 101"; //default: Standard Checking
+var subNav2 ="Accident"; //default: Standard Checking
 var subNav3 ="Accident + Hospital"; //default: Standard Savings
 var subNav4 ="Accident + Illness"; //default: Standard Checking + Savings
 
@@ -526,7 +526,8 @@ $(document).ready(function () {
         }
 
         if(isInteractionStudioUI){
-            if($('#userDetail > div.userDetailTopPane > div.userDetailRow.ng-isolate-scope > div > div.loaded-content > ng-transclude > div.left-col.ng-scope > h1').html().indexOf("User from") < 0 ){
+            var isUserProfileNameTag = $('h1.userDisplayName:eq(0)')[0];
+            if(isUserProfileNameTag && isUserProfileNameTag.innerHTML.trim() && isUserProfileNameTag.innerHTML.trim().indexOf("User from") < 0 ){
                 //persona info
                 $('.userDisplayName').html(personaName);
                 $('.customer-details tr:eq(0) td:eq(1)').html(personaEmail);
@@ -551,7 +552,6 @@ $(document).ready(function () {
                 $('#eventGrid div:eq(2) tr:eq(4) td:eq(1) ').html(event2);
                 $('#eventGrid div:eq(2) tr:eq(5) td:eq(1) ').html(event1);
             } else {
-                $('.userDisplayName').html("User from");
                 $('.customer-details tr:eq(1) td:eq(1)').html("User from " + personaCity);
                 $('.customer-details tr:eq(5) td:eq(1)').html("Just now");
                 //Event Stream
