@@ -1,0 +1,645 @@
+/* ----------- DO NOT EDIT BELOW ----------- */
+// ==UserScript==
+// @name         IS Accelerator - Cyrpto for Cumulus
+// @version      1.0
+// @author       Viral Patel, Scott Tallam
+// @description  Built on the work of Aaron Riley, Collin Kemble, and Bob Ullery, now everything is controlled with variables and includes a product catalog page
+// @match        http*://cumulusfinserv.herokuapp.com/*
+// @match        https://*.exacttarget.com/*
+// @match        https://*.marketingcloudapps.com/*
+// @match        https://*.evergage.com/*
+// @match        https://cumulusfsc.lightning.force.com/*
+// @exclude      https://*org62*/*
+// @require https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
+// @require https://gist.github.com/raw/2625891/waitForKeyElements.js
+// ==/UserScript==
+
+////Customer Company Info
+var companyName = "Cumulus";
+var companyURL = "cumulusfinserv.com"; // Do NOT include http, https, or www.
+var companyLogoURL = ""; // optional - this will be used to swap default SF logo in CRM/FSC.
+var companyPrimaryColor = ""; // optional - do NOT include the leading # sign. This will be used to swap the default color in CRM/FSC.
+var crmAppName = companyName+" - Marketing"; // optional - this is the CRM/FSC app name that you'd like to use.  Default is "Cumulus - Marketing".
+
+////Cumulus Website Labels
+/***************************************************************
+ * Website: TOP LEVEL SECTION: This is the Personal & Corporate sections of the site. (Default is Personal, Corporate).
+ ***************************************************************/
+var topLevelSection1 = "Individuals"; //default: Personal
+var topLevelSection2 = "Businesses"; //default: Corporate
+
+/***************************************************************
+ * Website: PRIMARY NAVIGATION: This is the Primary Page Navigation (Default is Banking, Credit Cards, Insurance, Investing, Loans, News).
+ ***************************************************************/
+var nav1 = "Prices"; //default: Banking
+var nav2 = "Services"; //default: Credit Cards
+var nav3 = "Security"; //default: Insurance
+var nav4 = "Resources"; //default: Investing
+var nav5 = "Blogs"; //default: Loans
+var nav6 = ""; //default: News
+
+/***************************************************************
+ * Website: DROP-DOWN MENU OPTION: Drop down menu item options under primary navigation option for "Banking".
+ ***************************************************************/
+var subNav1 ="Crypto Overview"; //default: Banking Overview
+var subNav2 ="Bitcoin"; //default: Standard Checking
+var subNav3 ="Ethereum"; //default: Standard Savings
+var subNav4 ="Litecoin"; //default: Standard Checking + Savings
+
+/***************************************************************
+ * Website: HOME PAGE HERO BANNER
+ ***************************************************************/
+     /***** DEFAULT (AKA Non-Personalized)  *****/
+     var homepageHeroBannerImage = "https://cumulus-fs.s3.amazonaws.com/images/banners/Hero-crypto-02.png"; //optional: Leave it blank if you don't want to update this image.
+     var homepageHeroBannerTitleLine1 = "The easiest way to buy"; //default: Life, it's one less
+     var homepageHeroBannerTitleLine2 = "& sell cryptocurrency"; //default: thing to worry about.
+     var homepageHeroBannerSubTitleLine1 = "Trusted by over 3B people"; //default: Open a free account with
+     var homepageHeroBannerSubTitleLine2 = "across the globe"; //default: Cumulus today!
+     var homepageHeroBannerCTAButtonLabel = "GET STARTED"; //default: Sign Up Now
+     var homepageHeroTextColor = "FFFFFF"; //default: 4F4F4F (dark).  Options: 4F4F4F (dark) or FFFFFF (light).
+
+     /***** PERSONALIZED *****/
+     var homepageHeroBannerImagePersonalized = "https://cumulus-fs.s3.amazonaws.com/images/banners/Hero-crypto-01.png"; //optional: Leave it blank if you don't want to update this image.
+     var homepageHeroBannerTitleLine1Personalized = "Get $5 in free Bitcoin"; //default: Life, it's one less
+     var homepageHeroBannerTitleLine2Personalized = "for signing up."; //default: thing to worry about.
+     var homepageHeroBannerSubTitleLine1Personalized = "We make buying and selling"; //default: Open a free account with
+     var homepageHeroBannerSubTitleLine2Personalized = "easy for you."; //default: Cumulus today!
+     var homepageHeroBannerCTAButtonLabelPersonalized = "GET STARTED"; //default: Sign Up Now
+     var homepageHeroTextColorPersonalized = "FFFFFF"; //default: 4F4F4F (dark).  Options: 4F4F4F (dark) or FFFFFF (light).
+
+/***************************************************************
+ * Website: HOME PAGE INTRO PARAGRAPH (UNDER BANNER)
+ ***************************************************************/
+var homepageIntroParaTitle = "Create your cryptocurrency portfolio today!"; //default: Life simplified.
+var homepageIntroParaDetail = "Discover how specific cryptocurrencies work and get a bit of each crypto to try out yourself.";
+var homepageIntroParaCTAButtonLabel = "GET STARTED"; //default: Sign Up for an Account
+
+/***************************************************************
+ * Website: HOME PAGE PRODUCT CATEGORIES UNDER INTRO PARAGRAPH
+ ***************************************************************/
+var homepageProductCategory1Title = "Manage Portfolio"; //default: Checking
+var homepageProductCategory1Detail = "Buy & sell popular digital currencies, keep track of them in one place."; //default: Thousands of ATMS and branches, plus absolutely no fees.
+var homepageProductCategory2Title = "Recurring Buys"; //default: Savings
+var homepageProductCategory2Detail = "Invest slowly over time by scheduling buys daily, weekly, or monthly.";
+var homepageProductCategory3Title = "Signature Card"; //default: Credit Cards
+var homepageProductCategory3Detail = "Earn upto 3.5% back in Bitcoin on every purchase with Signature Rewards Card.";
+var homepageProductCategory4Title = "Secure Storage"; //default: Borrowing
+var homepageProductCategory4Detail = "We store digital assets in secure offline storage.";
+var homepageProductCategory5Title = "Protected by Insurance"; //default: Investing
+var homepageProductCategory5Detail = "We carry crypto insurance & all USD cash balances are covered by FDIC insurance*.";
+
+/***************************************************************
+ * Website: HOME PAGE RECOMMENDATIONS (Personalized)
+ ***************************************************************/
+var homepageRecommendationsHeader = "Exploring digital currency?";
+
+var homepageRecommendations1Image = "https://cumulus-fs.s3.amazonaws.com/images/Cryptocurrency-blog-01.png"; //optional: Leave it blank if you don't want to update this image.
+var homepageRecommendations1Title = "10 Reasons to Buy Crypto";
+var homepageRecommendations1Detail = "Crypto is changing the world. We have 10 reasons to think why it is the future of money.";
+var homepageRecommendations1CTALabel = "Learn More";
+
+var homepageRecommendations2Image = "https://cumulus-fs.s3.amazonaws.com/images/Cryptocurrency-blog-02.png"; //optional: Leave it blank if you don't want to update this image.
+var homepageRecommendations2Title = "Buy Bitcoin with Apple Pay";
+var homepageRecommendations2Detail = "We are at the forefront of financial revolution. Now, you can purchase bitcoin from your mobile phone.";
+var homepageRecommendations2CTALabel = "Learn More";
+
+var homepageRecommendations3Image = "https://cumulus-fs.s3.amazonaws.com/images/Cryptocurrency-blog-03.png"; //optional: Leave it blank if you don't want to update this image.
+var homepageRecommendations3Title = "Buying Ethereum & Other Crypto";
+var homepageRecommendations3Detail = "Buying Bitcoin is easy. Want to learn how to buy other digital currency?";
+var homepageRecommendations3CTALabel = "Explore";
+
+var homepageRecommendations4Image = "https://cumulus-fs.s3.amazonaws.com/images/Cryptocurrency-blog-04.png"; //optional: Leave it blank if you don't want to update this image.
+var homepageRecommendations4Title = "Glorious Guide to NFT";
+var homepageRecommendations4Detail = "Recently, tech industry started experimenting with digital collectibles on Ethereum.";
+var homepageRecommendations4CTALabel = "Learn More";
+
+
+/***************************************************************
+ * Website: PRODUCT PAGE VIEW (FORMERLY BANKING > STANDARD CHECKING) - FIRST PRODUCT PAGE UNDER FIRST TOP NAV ITEM.
+ ***************************************************************/
+var productPageMainImage = "https://cumulus-fs.s3.amazonaws.com/images/Cryptocurrency-bitcoin-image-01.png"; //optional: Leave it blank if you don't want to update this image.
+var productPageIntroPara = "Create an account to buy and sell Bitcoin on the most secure crypto exchange."; //default: Make your financial life simpler.
+var productPageCTALabel = "Buy Bitcoin"; //default: Open an Account
+var productPageFeatureBullet1 = "Earn upto 6.05% APY interest on your crypto."; //default: Free transactions at over 7,200 ATMS
+var productPageFeatureBullet2 = "Industry leading security from day one including hardware security keys, SOC Certifications, and Insurance coverage."; //default: Unlimited check-writing
+var productPageFeatureBullet3 = "Tools for beginners & active traders."; //default: Bonus rates on select CDs and IRA CDs
+var productPageFeatureBullet4 = "Instant trades, diversify assets, low costs."; //default: Free Overdraft Protection setup and transfers
+var productPageRequirementBullet1 = "18+ years of age, legal US Resident or Citizen"; //default: $2,000 or greater, total qualifying direct ...
+var productPageRequirementBullet2 = "Open & fund your account"; //default: OR, $2,000 average monthly balance ...
+var productPageRequirementBullet3 = "Buy & Invest in Cryptocurrency"; //default: OR, $15,000 combined average monthly ...
+var productPageService1 = "How it works."; //default: Direct Deposit
+var productPageService2 = "Every transaction involving Bitcoin is tracked on the blockchain, which is similar to a bank’s ledger, or log of customers’ funds going in and out of the bank. In simple terms, it’s a record of every transaction ever made using bitcoin."; //default: Sign up to have your payroll, pension ...
+var productPageService3 = "Keep in mind."; //default: Overdraft Protection
+var productPageService4 = "Unlike a bank’s ledger, the Bitcoin blockchain is distributed across the entire network. No company, country, or third party is in control of it; and anyone can become part of that network. There will only ever be 21 million bitcoin. This is digital money that cannot be inflated or manipulated in any way."; //default: Safeguard your checking account ...
+var productPageDetails1 = "Market Cap"; //default: Minimum Deposit
+var productPageDetails2 = "$1.1T: 33% of crypto market"; //default: $25
+var productPageDetails3 = "Volume (24h)"; //default: Monthly Service Charge
+var productPageDetails4 = "$43.8B: +23.03%"; //default: $15 if the minimum deposit is not met
+var productPageDetails5 = "Circulating Supply"; //default: ATM Fees
+var productPageDetails6 = "18.8M BTC: 90% of total supply"; //default: $0 per transaction at Cumulus Bank ATMs
+
+/***************************************************************
+ * Social: (FAKE) FACEBOOK AD HOSTED ON THE HEROKU WEBSITE [https://cumulusfinserv.herokuapp.com/social/facebook/]
+ ***************************************************************/
+var facebookAdLogo = "https://cumulusfinserv.herokuapp.com/images/social/facebook/cumulus-cloud-logo.png"; //**note: ususally getting one from client's Twitter page works well.
+var facebookAdTitle = "Cryptocurrency for Humans"; //default: Managing Your Risk and Investments
+var facebookAdBanner = homepageHeroBannerImage; //default: "https://cumulusfinserv.herokuapp.com/images/social/facebook/post-wealth.png"
+var facebookAdTeaser = "Secure, Trusted, Insured Cyrptocurrency Platform."; //default: Secure Your Future With the Right Asset Mix.
+var facebookAdDescription = "Jump start your crypto portfolio today.  Get started now."; //default: Connect with one of our experienced advisors to map out your portfolio today.
+
+/***************************************************************
+ * IS: PERSONA INFORMATION FOR IS USER PROFILE
+ ***************************************************************/
+var personaName = "Rachel Morris";
+var personaEmail = "rmorris555@gmail.com";
+var personaCity = "Cleveland, OH";
+var personaLTV = "$1,400";
+var personaAOV = "$350";
+var personaOrders = "4";
+
+/***************************************************************
+ * IS: AFFINITY WHEEL
+ ***************************************************************/
+     /***** TOP RIGHT  *****/
+     var topRightLabel = "CHANNEL";
+     var topRightLine1 = "Web";
+     var topRightLine2 = "Email";
+     var topRightLine3 = "Push";
+     var topRightLine4 = "SMS";
+
+     /***** BOTTOM RIGHT  *****/
+     var bottomRightLabel = "KEYWORDS";
+     var bottomRightLine1 = "Prices";
+     var bottomRightLine2 = "Buy";
+     var bottomRightLine3 = "Trade";
+     var bottomRightLine4 = "";
+
+     /***** BOTTOM LEFT  *****/
+     var bottomLeftLabel = "PRODUCTS";
+     var bottomLeftLine1 = "Bitcoin";
+     var bottomLeftLine2 = "Ethereum";
+     var bottomLeftLine3 = "Markets";
+     var bottomLeftLine4 = "Security";
+
+     /***** TOP LEFT  *****/
+     var topLeftLabel = "CATEGORY";
+     var topLeftLine1 = "Individuals";
+     var topLeftLine2 = "Businesses";
+     var topLeftLine3 = "Developers";
+     var topLeftLine4 = "";
+
+/***************************************************************
+ * IS: PRODUCT INFORMATION FOR PRODUCT TIME LINE
+ ***************************************************************/
+////Product Info - https://interactionstudio.evergage.com/ui/index.html#/dataset/nto/catalog/itemEdit?itemType=Product&itemId=2040247&timeRange=pastWeek
+var product1name = "Bitcoin - Start Trading Today!";
+var product1image = "https://cumulus-fs.s3.amazonaws.com/images/Cryptocurrency-bitcoin-image-01.png";
+var product1url = "#";
+var product1description = "Trade Bitcoin today.";
+var product1price = "25.98";
+var product1listprice = "25.99";
+var product1subcatTag1 = "Cryptocurrency";
+var product1subcatTag2 = "Bitcoin";
+var product1subcatTag3 = "Trade";
+var product1styleTag1 = "Cyrptocurrency";
+var product1styleTag2 = "Bitcoin";
+var product1categoryTag1 = "Cryptocurrency | Bitcoin | Trade";
+
+/***************************************************************
+ * IS: RECS IMAGES FOR RECIPE PREVIEW/SIMULATION SCREEN
+ ***************************************************************/
+///By default these 4 images are the same as the homepage recs.  Feel free to replace them with different image URLs, if necessary.
+var productRec1image = homepageRecommendations1Image;
+var productRec2image = homepageRecommendations2Image;
+var productRec3image = homepageRecommendations3Image;
+var productRec4image = homepageRecommendations4Image;
+
+/***************************************************************
+ * IS: EVENT STREAM
+ ***************************************************************/
+     /***** ANONYMOUS EVENTS  *****/
+     var event1 = "Viewed: Homepage";
+     var event2 = "Viewed: Markets & Prices";
+     var event3 = "Viewed: Bitcoin";
+     var event4 = "Viewed: Open an Account";
+
+     /***** KNOWN (POST ID) EVENTS  *****/
+     var event5 = "Abandoned Open an Account Online";
+     var event6 = "Engaged - Abandoned Open an Account Email";
+
+var replaceArry = [
+    [/cumulusfinserv.herokuapp.com/gi,companyURL],
+    [/cumulusfinserv.com/gi,companyURL],
+    [/cumulus.com/gi,companyURL],
+    [/Cumulus Financial/g,companyName],
+    [/Cumulus/g,companyName],
+    [/Average Order Value/gi, "Average Balance"],
+    [/Orders/gi, "Annual Balance"],
+];
+
+
+function addGlobalStyle(css) {
+   var head, style;
+   head = document.getElementsByTagName('head')[0];
+   if (!head) { return; }
+   style = document.createElement('style');
+   style.type = 'text/css';
+   style.innerHTML = css;
+   head.appendChild(style);
+}
+//addGlobalStyle('.gender-affinities { display: none; }');
+//addGlobalStyle('#pdp-promo3 { background-image: url("https://image.s4.sfmc-content.com/lib/fe36117276640479751c73/m/1/f4cddb17-a257-42df-8148-69830cab2e48.png");  height: 314px; width: 1036px; margin: 0 auto; }');
+
+var numTerms    = replaceArry.length;
+var transTimer  = setInterval (translateTermsOnPage, 222);
+
+function translateTermsOnPage () {
+    var txtWalker   = document.createTreeWalker (
+        document.body,
+        NodeFilter.SHOW_TEXT, {
+            acceptNode: function (node) {
+                if (node.nodeValue.trim() ) {
+                    if (node.tmWasProcessed)
+                        return NodeFilter.FILTER_SKIP;
+                    else
+                        return NodeFilter.FILTER_ACCEPT;
+                }
+                return NodeFilter.FILTER_SKIP;
+            }
+        },
+        false
+    );
+    var txtNode     = null;
+    while (txtNode  = txtWalker.nextNode()) {
+        txtNode.nodeValue       = replaceAllTerms (txtNode.nodeValue);
+        txtNode.tmWasProcessed  = true;
+    }
+    var placeholderNodes = document.querySelectorAll ("[placeholder]");
+}
+
+function replaceAllTerms (oldTxt) {
+    for (var J  = 0;  J < numTerms;  J++) {
+        oldTxt  = oldTxt.replace (replaceArry[J][0], replaceArry[J][1]);
+    }
+    return oldTxt;
+}
+
+const crmISRecsTitles = [homepageRecommendations1Title, homepageRecommendations2Title, homepageRecommendations3Title, homepageRecommendations4Title];
+const crmISRecsDetails = [homepageRecommendations1Detail, homepageRecommendations2Detail, homepageRecommendations3Detail, homepageRecommendations4Detail];
+const crmISRecsImages = [homepageRecommendations1Image, homepageRecommendations2Image, homepageRecommendations3Image, homepageRecommendations4Image];
+function replaceCRMISRecommendations(i){
+    var crmTag = $('#brandBand_2 > div > div').find('.custom-header:eq('+i+')');
+    if(crmTag){
+        crmTag.html(crmISRecsTitles[i]);
+    }
+    crmTag = $('#brandBand_2 > div > div').find('.slds-p-left_x-small:eq('+i+') > span');
+    if(crmTag){
+        crmTag.html(crmISRecsDetails[i]);
+    }
+    if(crmISRecsImages[i].trim()){
+        crmTag = $('#brandBand_2 > div > div').find('.imageBox:eq('+i+')');
+        if(crmTag){
+            crmTag.attr("src", crmISRecsImages[i]);
+        }
+    }
+}
+
+var $ = window.jQuery;
+$(document).ready(function () {
+    let checkFunction = function(){
+       if($('.navbar-header').length > 0){
+           //document.getElementById("side-bar-nav").style = "background-color:#E8E5DE;";
+           clearInterval(this);
+       }
+    }
+    var checkForLogoInterval = setInterval(checkFunction, 200);
+
+    function replaceContent () {
+
+        //product page
+        if($('#pageExceptFooter .breadcrumb li:eq(0) span').html() == "Catalog"){
+            document.title = product1name;
+        }
+        var isWebsite = false;
+        if(window.location.hostname.indexOf("cumulusfinserv.herokuapp.com") > -1 || window.location.hostname.indexOf("cumulusfinserv.com") > -1){
+            isWebsite = true;
+        }
+        var isCRM = false;
+        if(window.location.hostname.indexOf("cumulusfsc.lightning.force.com") > -1){
+            isCRM = true;
+        }
+        var isInteractionStudioUI = false;
+        if(window.location.hostname.indexOf("exacttarget.com") > -1 || window.location.hostname.indexOf("evergage.com") > -1){
+            isInteractionStudioUI = true;
+        }
+        var isPersonalized = false;
+        if($("#is-personalized-experience").length){
+            isPersonalized = true;
+        }
+
+        if(isWebsite){
+            /***************************************************************
+             * TOP LEVEL SECTION: This is the Personal & Corporate sections of the site. (Default is Personal, Corporate).
+             ***************************************************************/
+            $('#nav-personal').html(topLevelSection1);
+            $('#nav-corporate').html(topLevelSection2);
+
+            /***************************************************************
+             * PRIMARY NAVIGATION: This is the Primary Page Navigation (Default is Banking, Credit Cards, Insurance, Investing, Loans, News).
+             ***************************************************************/
+            $('').html(topLevelSection1);
+            $('#nav-personal-banking > span').html(nav1);
+            $('#nav-credit-cards > span').html(nav2);
+            $('#nav-personal-insurance > span').html(nav3);
+            $('#nav-personal-investing > span').html(nav4);
+            $('#nav-personal-borrowing > span').html(nav5);
+            $('#nav-personal-news').html(nav6);
+
+            /***************************************************************
+             * DROP-DOWN MENU OPTION: Drop down menu item options under primary navigation option for "Banking".
+             ***************************************************************/
+            $('#personal-banking > ul > li:nth-child(1) > a').html(subNav1);
+            $('#personal-banking > ul > li:nth-child(3) > a').html(subNav2);
+            $('#personal-banking > ul > li:nth-child(4) > a').html(subNav3);
+            $('#personal-banking > ul > li:nth-child(5) > a').html(subNav4);
+
+            /***************************************************************
+             * HOME PAGE HERO BANNER - DEFAULT (AKA Non-Personalized)
+             ***************************************************************/
+            var homepageHeroBannerDimensions = "height: 500px; width:1170px;";
+            if(isPersonalized){
+                homepageHeroBannerImage = homepageHeroBannerImagePersonalized;
+                homepageHeroBannerTitleLine1 = homepageHeroBannerTitleLine1Personalized;
+                homepageHeroBannerTitleLine2 = homepageHeroBannerTitleLine2Personalized
+                homepageHeroBannerSubTitleLine1 = homepageHeroBannerSubTitleLine1Personalized;
+                homepageHeroBannerSubTitleLine2 = homepageHeroBannerSubTitleLine2Personalized;
+                homepageHeroBannerCTAButtonLabel = homepageHeroBannerCTAButtonLabelPersonalized;
+                homepageHeroTextColor = homepageHeroTextColorPersonalized;
+                homepageHeroBannerDimensions = "height: 393px; width:1170px;";
+            }
+            if(homepageHeroBannerImage.trim()){
+                $('#hp-banner-image').attr("src", homepageHeroBannerImage);
+                $('#hp-banner-image').attr("style", homepageHeroBannerDimensions);
+            }
+            $('#hp-banner-title1').html(homepageHeroBannerTitleLine1);
+            $('#hp-banner-title2').html(homepageHeroBannerTitleLine2);
+            $('#hp-banner-title1').attr("style","fill: #"+homepageHeroTextColor+" !important;");
+            $('#hp-banner-title2').attr("style","fill: #"+homepageHeroTextColor+" !important;");
+            $('#hp-banner-subtitle1').html(homepageHeroBannerSubTitleLine1);
+            $('#hp-banner-subtitle2').html(homepageHeroBannerSubTitleLine2);
+            $('#hp-banner-subtitle1').attr("style","fill: #"+homepageHeroTextColor+" !important;");
+            $('#hp-banner-subtitle2').attr("style","fill: #"+homepageHeroTextColor+" !important;");
+            $('#hp-banner-cta').html(homepageHeroBannerCTAButtonLabel);
+
+            /***************************************************************
+             * HOME PAGE INTRO PARAGRAPH (UNDER BANNER) - DEFAULT (AKA Non-Personalized)
+             ***************************************************************/
+            $('#hp-intro-para-title').html(homepageIntroParaTitle);
+            $('#hp-intro-para-detail').html(homepageIntroParaDetail);
+            $('#hp-intro-para-cta').html(homepageIntroParaCTAButtonLabel);
+
+            /***************************************************************
+             * HOME PAGE PRODUCT CATEGORIES UNDER INTRO PARAGRAPH - DEFAULT (AKA Non-Personalized)
+             ***************************************************************/
+            $('#hp-product-category-1 > h4 > a').html(homepageProductCategory1Title);
+            $('#hp-product-category-1 > p').html(homepageProductCategory1Detail);
+            $('#hp-product-category-2 > h4 > a').html(homepageProductCategory2Title);
+            $('#hp-product-category-2 > p').html(homepageProductCategory2Detail);
+            $('#hp-product-category-3 > h4 > a').html(homepageProductCategory3Title);
+            $('#hp-product-category-3 > p').html(homepageProductCategory3Detail);
+            $('#hp-product-category-4 > h4 > a').html(homepageProductCategory4Title);
+            $('#hp-product-category-4 > p').html(homepageProductCategory4Detail);
+            $('#hp-product-category-5 > h4 > a').html(homepageProductCategory5Title);
+            $('#hp-product-category-5 > p').html(homepageProductCategory5Detail);
+
+            /***************************************************************
+             * HOME PAGE RECOMMENDATIONS (Personalized)
+             ***************************************************************/
+            if(isPersonalized){
+                $('#hp-blog-recommendations-title').html(homepageRecommendationsHeader);
+                if(homepageRecommendations1Image.trim()){
+                    $('#hp-blog-0-image-div').css("background-image","url("+homepageRecommendations1Image+")");
+                }
+                $('#hp-blog-0-title').html(homepageRecommendations1Title);
+                $('#hp-blog-0-detail').html(homepageRecommendations1Detail);
+                $('#hp-blog-0-cta-label').html(homepageRecommendations1CTALabel);
+
+                if(homepageRecommendations2Image.trim()){
+                    $('#hp-blog-1-image-div').css("background-image","url("+homepageRecommendations2Image+")");
+                }
+                $('#hp-blog-1-title').html(homepageRecommendations2Title);
+                $('#hp-blog-1-detail').html(homepageRecommendations2Detail);
+                $('#hp-blog-1-cta-label').html(homepageRecommendations2CTALabel);
+
+                if(homepageRecommendations3Image.trim()){
+                    $('#hp-blog-2-image-div').css("background-image","url("+homepageRecommendations3Image+")");
+                }
+                $('#hp-blog-2-title').html(homepageRecommendations3Title);
+                $('#hp-blog-2-detail').html(homepageRecommendations3Detail);
+                $('#hp-blog-2-cta-label').html(homepageRecommendations3CTALabel);
+
+                if(homepageRecommendations4Image.trim()){
+                    $('#hp-blog-3-image-div').css("background-image","url("+homepageRecommendations4Image+")");
+                }
+                $('#hp-blog-3-title').html(homepageRecommendations4Title);
+                $('#hp-blog-3-detail').html(homepageRecommendations4Detail);
+                $('#hp-blog-3-cta-label').html(homepageRecommendations4CTALabel);
+            }
+
+            /***************************************************************
+             * (FAKE) SOCIAL FACEBOOK AD
+             ***************************************************************/
+            if(window.location.pathname.indexOf("/social/facebook") > -1){
+                $('#fbAdLogo').attr("src", facebookAdLogo);
+                $('#fbAdTitle').html(facebookAdTitle);
+                $('#fbAdImage').attr("src", facebookAdBanner);
+                $('#fbAdTeaser').html(facebookAdTeaser);
+                $('#fbAdDescription').html(facebookAdDescription);
+            }
+
+            /***************************************************************
+             * PRODUCT PAGE VIEW (FORMERLY BANKING > STANDARD CHECKING) - FIRST PRODUCT PAGE UNDER FIRST TOP NAV ITEM.
+             ***************************************************************/
+            if(window.location.pathname.indexOf("/banking/standard-checking") > -1){
+                if(productPageMainImage.trim()){
+                    $('.pdp-img-responsive').attr("src", productPageMainImage);
+                    $('.pdp-img-responsive').attr("style", "max-width: 360px;");
+                }
+                $('body > div.container.product-intro > div > div.col-md-8 > h1').html(subNav2);
+                $('body > div.container.product-intro > div > div.col-md-8 > h3').html(productPageIntroPara);
+                $('body > div.container.product-intro > div > div.col-md-8 > a').html(productPageCTALabel);
+                $('body > div.container.product-details > div > div.col-md-8 > h3').html(subNav2+" Benefits");
+                $('body > div.container.product-details > div > div.col-md-8 > div > div:nth-child(1) > ul > li:nth-child(1)').html(productPageFeatureBullet1);
+                $('body > div.container.product-details > div > div.col-md-8 > div > div:nth-child(1) > ul > li:nth-child(2)').html(productPageFeatureBullet2);
+                $('body > div.container.product-details > div > div.col-md-8 > div > div:nth-child(1) > ul > li:nth-child(3)').html(productPageFeatureBullet3);
+                $('body > div.container.product-details > div > div.col-md-8 > div > div:nth-child(1) > ul > li:nth-child(4)').html(productPageFeatureBullet4);
+                $('body > div.container.product-details > div > div.col-md-8 > div > div:nth-child(2) > div > ul > li:nth-child(1)').html(productPageRequirementBullet1);
+                $('body > div.container.product-details > div > div.col-md-8 > div > div:nth-child(2) > div > ul > li:nth-child(2)').html(productPageRequirementBullet2);
+                $('body > div.container.product-details > div > div.col-md-8 > div > div:nth-child(2) > div > ul > li:nth-child(3)').html(productPageRequirementBullet3);
+                $('body > div.container.product-details > div > div.col-md-8 > h4').html(subNav2+" Services");
+                $('body > div.container.product-details > div > div.col-md-8 > p:nth-child(4)').html("<strong>"+productPageService1+"</strong> "+productPageService2);
+                $('body > div.container.product-details > div > div.col-md-8 > p:nth-child(5)').html("<strong>"+productPageService3+"</strong> "+productPageService4);
+                $('body > div.container.product-details > div > div.col-md-4.sidebar > h4').html(subNav2+" Details");
+                $('body > div.container.product-details > div > div.col-md-4.sidebar > h5:nth-child(2)').html(productPageDetails1);
+                $('body > div.container.product-details > div > div.col-md-4.sidebar > p:nth-child(3)').html(productPageDetails2);
+                $('body > div.container.product-details > div > div.col-md-4.sidebar > h5:nth-child(4)').html(productPageDetails3);
+                $('body > div.container.product-details > div > div.col-md-4.sidebar > p:nth-child(5)').html(productPageDetails4);
+                $('body > div.container.product-details > div > div.col-md-4.sidebar > h5:nth-child(6)').html(productPageDetails5);
+                $('body > div.container.product-details > div > div.col-md-4.sidebar > p:nth-child(7)').html(productPageDetails6);
+            }
+        } // End: if isWebsite
+
+        if(isCRM){
+            if(companyLogoURL.trim()){
+                $('.slds-global-header__logo').attr("style", 'background-image: url('+companyLogoURL+');');
+            }
+            if(companyPrimaryColor.trim()){
+                $('.slds-context-bar').attr("style", 'border-bottom-color: #'+companyPrimaryColor+';');
+            }
+            if(crmAppName.trim()){
+                $('.appName > span').html(crmAppName);
+            }
+
+             /***************************************************************
+             * CRM: IS Next Best Recommendations
+             ***************************************************************/
+            if($('#brandBand_2 > div > div').find('.custom-header').length > 0){
+                replaceCRMISRecommendations(0);
+                replaceCRMISRecommendations(1);
+                replaceCRMISRecommendations(2);
+                replaceCRMISRecommendations(3);
+            }
+        }
+        if(isInteractionStudioUI){
+            $('#pageExceptFooter .breadcrumb li:eq(2)').html(product1name);
+            $('.page-header .col-sm-6 h2').html(product1name);
+            $('input#name').val(product1name);
+            $('input#imageUrl').val(product1image);
+            $('input#url').val(product1url);
+            $('.form-group .itemImage').attr("src", product1image);
+            $('textarea#description').val(product1description);
+            $('input#price').val(product1price);
+            $('input#listPrice').val(product1listprice);
+            $('tags-input:eq(0) li.ng-scope:eq(0)').html(product1subcatTag1 + "<a class='remove-button ng-binding ng-scope' ng-click='$removeTag()' ng-bind='::$$removeTagSymbol'>×</a>");
+            $('tags-input:eq(0) li.ng-scope:eq(1)').html(product1subcatTag2 + "<a class='remove-button ng-binding ng-scope' ng-click='$removeTag()' ng-bind='::$$removeTagSymbol'>×</a>");
+            $('tags-input:eq(0) li.ng-scope:eq(2)').html(product1subcatTag3 + "<a class='remove-button ng-binding ng-scope' ng-click='$removeTag()' ng-bind='::$$removeTagSymbol'>×</a>");
+            $('tags-input:eq(2) li.ng-scope:eq(0)').html(product1styleTag1 + "<a class='remove-button ng-binding ng-scope' ng-click='$removeTag()' ng-bind='::$$removeTagSymbol'>×</a>");
+            $('tags-input:eq(2) li.ng-scope:eq(1)').html(product1styleTag2 + "<a class='remove-button ng-binding ng-scope' ng-click='$removeTag()' ng-bind='::$$removeTagSymbol'>×</a>");
+            $('tags-input:eq(4) li.ng-scope:eq(0)').html(product1categoryTag1 + "<a class='remove-button ng-binding ng-scope' ng-click='$removeTag()' ng-bind='::$$removeTagSymbol'>×</a>");
+            //product recs simulation
+            $('.k-widget li.selection-preview img:eq(0)').attr("src", product1image);
+            $('.k-widget h3.item-name').html(product1name);
+            $('#highcharts-8 .highcharts-axis-labels text:eq(0) tspan').html(topLeftLine1);
+            $('#highcharts-8 .highcharts-axis-labels text:eq(1) tspan').html(topLeftLine2);
+            $('#highcharts-8 .highcharts-axis-labels text:eq(2) tspan').html(topLeftLine3);
+            $('#highcharts-8 .highcharts-axis-labels text:eq(3) tspan').html(topLeftLine4);
+            $('#highcharts-4 .highcharts-axis-labels text:eq(0) tspan').html(topLeftLine1);
+            $('#highcharts-4 .highcharts-axis-labels text:eq(1) tspan').html(topLeftLine2);
+            $('#highcharts-4 .highcharts-axis-labels text:eq(2) tspan').html(topLeftLine3);
+            $('#highcharts-4 .highcharts-axis-labels text:eq(3) tspan').html(topLeftLine4);
+            $('#highcharts-0 .highcharts-axis-labels text:eq(0) tspan').html(topLeftLine1);
+            $('#highcharts-0 .highcharts-axis-labels text:eq(1) tspan').html(topLeftLine2);
+            $('#highcharts-0 .highcharts-axis-labels text:eq(2) tspan').html(topLeftLine3);
+            $('#highcharts-0 .highcharts-axis-labels text:eq(3) tspan').html(topLeftLine4);
+            $('#highcharts-12 .highcharts-axis-labels text:eq(0) tspan').html(topLeftLine1);
+            $('#highcharts-12 .highcharts-axis-labels text:eq(1) tspan').html(topLeftLine2);
+            $('#highcharts-12 .highcharts-axis-labels text:eq(2) tspan').html(topLeftLine3);
+            $('#highcharts-12 .highcharts-axis-labels text:eq(3) tspan').html(topLeftLine4);
+
+            $('.recommendations:eq(0) img:eq(0)').attr("src", productRec1image);
+            $('.recommendations:eq(0) img:eq(1)').attr("src", productRec2image);
+            $('.recommendations:eq(0) img:eq(2)').attr("src", productRec3image);
+            $('.recommendations:eq(0) img:eq(3)').attr("src", productRec4image);
+            $('.recommendations:eq(1) img:eq(0)').attr("src", productRec3image);
+            $('.recommendations:eq(1) img:eq(1)').attr("src", productRec2image);
+            $('.recommendations:eq(1) img:eq(2)').attr("src", productRec1image);
+            $('.recommendations:eq(1) img:eq(3)').attr("src", productRec4image);
+            $('.recommendations:eq(2) img:eq(0)').attr("src", productRec1image);
+            $('.recommendations:eq(2) img:eq(1)').attr("src", productRec3image);
+            $('.recommendations:eq(2) img:eq(2)').attr("src", productRec2image);
+            $('.recommendations:eq(2) img:eq(3)').attr("src", productRec4image);
+
+            $('.recommendations:eq(3) img:eq(0)').attr("src", productRec1image);
+            $('.recommendations:eq(3) img:eq(1)').attr("src", productRec2image);
+            $('.recommendations:eq(3) img:eq(2)').attr("src", productRec3image);
+            $('.recommendations:eq(3) img:eq(3)').attr("src", productRec4image);
+            //profile page - Metrics Summary
+
+            $('h2.userLocation span').html(personaCity);
+        }
+
+        if(isInteractionStudioUI){
+            var isUserProfileNameTag = $('h1.userDisplayName:eq(0)')[0];
+            if(isUserProfileNameTag && isUserProfileNameTag.innerHTML.trim() && isUserProfileNameTag.innerHTML.trim().indexOf("User from") < 0 ){
+                //persona info
+                $('.userDisplayName').html(personaName);
+                $('.customer-details tr:eq(0) td:eq(1)').html(personaEmail);
+                $('.customer-details tr:eq(1) td:eq(1)').html(personaName);
+                $('.customer-details tr:eq(2) td:eq(1)').html(personaEmail);
+                $('.customer-details tr:eq(4) td:eq(1)').html(personaLTV);
+                $('.metrics-summary .panel-wrapper:eq(0) .panel-header').html(personaLTV);
+                $('.metrics-summary .panel-wrapper:eq(1) .panel-header').html(personaOrders);
+                $('.metrics-summary .panel-wrapper:eq(2) .panel-header').html(personaAOV);
+                //Event Stream
+                $('.eventStreamTable .rightPreviewPane tr:eq(3) td:eq(1) a').html(personaEmail);
+                $('#eventGrid div:eq(2) tr:eq(0) td:eq(0) ').html("A few seconds ago");
+                $('#eventGrid div:eq(2) tr:eq(1) td:eq(0) ').html("A few seconds ago");
+                $('#eventGrid div:eq(2) tr:eq(2) td:eq(0) ').html("A few seconds ago");
+                $('#eventGrid div:eq(2) tr:eq(3) td:eq(0) ').html("A few seconds ago");
+                $('#eventGrid div:eq(2) tr:eq(4) td:eq(0) ').html("A few seconds ago");
+                $('#eventGrid div:eq(2) tr:eq(5) td:eq(0) ').html("A few seconds ago");
+                $('#eventGrid div:eq(2) tr:eq(0) td:eq(1) ').html(event6);
+                $('#eventGrid div:eq(2) tr:eq(1) td:eq(1) ').html(event5);
+                $('#eventGrid div:eq(2) tr:eq(2) td:eq(1) ').html(event4);
+                $('#eventGrid div:eq(2) tr:eq(3) td:eq(1) ').html(event3);
+                $('#eventGrid div:eq(2) tr:eq(4) td:eq(1) ').html(event2);
+                $('#eventGrid div:eq(2) tr:eq(5) td:eq(1) ').html(event1);
+            } else {
+                $('.customer-details tr:eq(1) td:eq(1)').html("User from " + personaCity);
+                $('.customer-details tr:eq(5) td:eq(1)').html("Just now");
+                //Event Stream
+                $('#eventGrid div:eq(2) tr:eq(0) td:eq(0) ').html("A few seconds ago");
+                $('#eventGrid div:eq(2) tr:eq(1) td:eq(0) ').html("A few seconds ago");
+                $('#eventGrid div:eq(2) tr:eq(2) td:eq(0) ').html("A few seconds ago");
+                $('#eventGrid div:eq(2) tr:eq(3) td:eq(0) ').html("A few seconds ago");
+                $('#eventGrid div:eq(2) tr:eq(0) td:eq(1) ').html(event4);
+                $('#eventGrid div:eq(2) tr:eq(1) td:eq(1) ').html(event3);
+                $('#eventGrid div:eq(2) tr:eq(2) td:eq(1) ').html(event2);
+                $('#eventGrid div:eq(2) tr:eq(3) td:eq(1) ').html(event1);
+                $('#eventGrid div:eq(2) tr').slice(4,20).html("");
+            }
+        }
+
+        if(isInteractionStudioUI){
+            $('.customer-details tr:eq(6) td:eq(1)').html("Just now");
+            //profile page - affinity wheel
+
+            $('#egAffinityQuadrantsChart .highcharts-container text:eq(0) textpath').html(topRightLabel);
+            $('#highChartsQuadrantCharts #topRight g.highcharts-axis-labels text:eq(0) tspan').html(topRightLine1);
+            $('#highChartsQuadrantCharts #topRight g.highcharts-axis-labels text:eq(1) tspan').html(topRightLine2);
+            $('#highChartsQuadrantCharts #topRight g.highcharts-axis-labels text:eq(2) tspan').html(topRightLine3);
+            $('#highChartsQuadrantCharts #topRight g.highcharts-axis-labels text:eq(3) tspan').html(topRightLine4);
+            $('#egAffinityQuadrantsChart .highcharts-container text:eq(1) textpath').html(bottomRightLabel);
+            $('#highChartsQuadrantCharts #bottomRight g.highcharts-axis-labels text:eq(0) tspan').html(bottomRightLine1);
+            $('#highChartsQuadrantCharts #bottomRight g.highcharts-axis-labels text:eq(1) tspan').html(bottomRightLine2);
+            $('#highChartsQuadrantCharts #bottomRight g.highcharts-axis-labels text:eq(2) tspan').html(bottomRightLine3);
+            $('#highChartsQuadrantCharts #bottomRight g.highcharts-axis-labels text:eq(3) tspan').html(bottomRightLine4);
+            $('#egAffinityQuadrantsChart .highcharts-container text:eq(2) textpath').html(bottomLeftLabel);
+            $('#highChartsQuadrantCharts #bottomLeft g.highcharts-axis-labels text:eq(0) tspan').html(bottomLeftLine1);
+            $('#highChartsQuadrantCharts #bottomLeft g.highcharts-axis-labels text:eq(1) tspan').html(bottomLeftLine2);
+            $('#highChartsQuadrantCharts #bottomLeft g.highcharts-axis-labels text:eq(2) tspan').html(bottomLeftLine3);
+            $('#highChartsQuadrantCharts #bottomLeft g.highcharts-axis-labels text:eq(3) tspan').html(bottomLeftLine4);
+            $('#egAffinityQuadrantsChart .highcharts-container text:eq(3) textpath').html(topLeftLabel);
+            $('#highChartsQuadrantCharts #topLeft g.highcharts-axis-labels text:eq(0) tspan').html(topLeftLine1);
+            $('#highChartsQuadrantCharts #topLeft g.highcharts-axis-labels text:eq(1) tspan').html(topLeftLine2);
+            $('#highChartsQuadrantCharts #topLeft g.highcharts-axis-labels text:eq(2) tspan').html(topLeftLine3);
+            $('#highChartsQuadrantCharts #topLeft g.highcharts-axis-labels text:eq(3) tspan').html(topLeftLine4);
+            //profile page - products
+            $('.rightPreviewPane .vrow img').attr("src", product1image);
+            $('.rightPreviewPane .vrow .itemName').html(product1name);
+            $('.rightPreviewPane .vrow .purchaseValue').html(product1price);
+            $('.rightPreviewPane .vrow .purchaseDetails:eq(1)').html("$"+product1price + " Each");
+        }
+    }
+    var imgTimer = setInterval(replaceContent, 200);
+})();
