@@ -13,7 +13,7 @@
 // @require https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @require https://gist.github.com/raw/2625891/waitForKeyElements.js
 // ==/UserScript==
-var logFlag = 0;
+
 ////Customer Company Info
 var companyName = "Cumulus";
 var companyURL = "cumulusfinserv.com"; // Do NOT include http, https, or www.
@@ -22,6 +22,12 @@ var companyPrimaryColor = ""; // optional - do NOT include the leading # sign. T
 var crmAppName = companyName+" - Marketing"; // optional - this is the CRM/FSC app name that you'd like to use.  Default is "Cumulus - Marketing".
 
 ////Cumulus Website Labels
+/***************************************************************
+ * Website: TOP LEVEL SECTION: This is the Personal & Corporate sections of the site. (Default is Personal, Corporate).
+ ***************************************************************/
+var topLevelSection1 = "Individuals"; //default: Personal
+var topLevelSection2 = "Business Owners"; //default: Corporate
+
 /***************************************************************
  * Website: PRIMARY NAVIGATION: This is the Primary Page Navigation (Default is Banking, Credit Cards, Insurance, Investing, Loans, News).
  ***************************************************************/
@@ -50,14 +56,16 @@ var subNav4 ="Accident + Illness"; //default: Standard Checking + Savings
      var homepageHeroBannerSubTitleLine1 = "Learn the value of"; //default: Open a free account with
      var homepageHeroBannerSubTitleLine2 = "supplemental insurance"; //default: Cumulus today!
      var homepageHeroBannerCTAButtonLabel = "LEARN MORE"; //default: Sign Up Now
+     var homepageHeroTextColor = "4F4F4F"; //default: 4F4F4F (dark).  Options: 4F4F4F (dark) or FFFFFF (light).
 
      /***** PERSONALIZED *****/
-     var homepageHeroBannerImagePersonalized = "https://image.s4.sfmc-content.com/lib/fe95157477610d7f76/m/1/257fea19-ec0d-46ad-9b2f-459c9286b575.jpg"; //optional: Leave it blank if you don't want to update this image.
+     var homepageHeroBannerImagePersonalized = "https://cumulus-fs.s3.amazonaws.com/images/banners/Hero-supplemental-insurance-02.png"; //optional: Leave it blank if you don't want to update this image.
      var homepageHeroBannerTitleLine1Personalized = "Accidents happen. We can"; //default: Life, it's one less
      var homepageHeroBannerTitleLine2Personalized = "help them hurt a little less."; //default: thing to worry about.
      var homepageHeroBannerSubTitleLine1Personalized = "Here's how you can get accident"; //default: Open a free account with
      var homepageHeroBannerSubTitleLine2Personalized = "insurance with us."; //default: Cumulus today!
      var homepageHeroBannerCTAButtonLabelPersonalized = "REQUEST A QUOTE"; //default: Sign Up Now
+     var homepageHeroTextColorPersonalized = "FFFFFF"; //default: 4F4F4F (dark).  Options: 4F4F4F (dark) or FFFFFF (light).
 
 /***************************************************************
  * Website: HOME PAGE INTRO PARAGRAPH (UNDER BANNER)
@@ -85,7 +93,7 @@ var homepageProductCategory5Detail = "Various dental coverage options for the le
  ***************************************************************/
 var homepageRecommendationsHeader = "Need more information?";
 
-var homepageRecommendations1Image = "https://image.s4.sfmc-content.com/lib/fe95157477610d7f76/m/1/14da0d51-6790-48b9-a577-91cfd7cb1f98.jpeg"; //optional: Leave it blank if you don't want to update this image.
+var homepageRecommendations1Image = "https://cumulus-fs.s3.amazonaws.com/images/Supplemental-insurance-blog-01.png"; //optional: Leave it blank if you don't want to update this image.
 var homepageRecommendations1Title = "What is Accident Insurance";
 var homepageRecommendations1Detail = "Here's what an accident insurance plan covers and how it can help you get back on your feet quicker.";
 var homepageRecommendations1CTALabel = "Learn More";
@@ -130,6 +138,14 @@ var productPageDetails4 = "$349.44"; //default: $15 if the minimum deposit is no
 var productPageDetails5 = "Estimate Based on"; //default: ATM Fees
 var productPageDetails6 = "Individual coverage for a policy holder aged 18 to 64"; //default: $0 per transaction at Cumulus Bank ATMs
 
+/***************************************************************
+ * Social: (FAKE) FACEBOOK AD HOSTED ON THE HEROKU WEBSITE [https://cumulusfinserv.herokuapp.com/social/facebook/]
+ ***************************************************************/
+var facebookAdLogo = "https://cumulusfinserv.herokuapp.com/images/social/facebook/cumulus-cloud-logo.png"; //**note: ususally getting one from client's Twitter page works well.
+var facebookAdTitle = companyName+" can provide supplemental insurance to cover unplanned expenses."; //default: Managing Your Risk and Investments
+var facebookAdBanner = homepageHeroBannerImage; //default: "https://cumulusfinserv.herokuapp.com/images/social/facebook/post-wealth.png"
+var facebookAdTeaser = "Tackling unexpected medical expenses?"; //default: Secure Your Future With the Right Asset Mix.
+var facebookAdDescription = "We can help cover unplanned out-of-pocket costs.  Get a quote today!"; //default: Connect with one of our experienced advisors to map out your portfolio today.
 
 /***************************************************************
  * IS: PERSONA INFORMATION FOR IS USER PROFILE
@@ -211,8 +227,9 @@ var productRec4image = "https://image.s4.sfmc-content.com/lib/fe3311727664047970
 var replaceArry = [
     [/cumulusfinserv.herokuapp.com/gi,companyURL],
     [/cumulusfinserv.com/gi,companyURL],
-    [/Cumulus Financial/gi,companyName],
-    [/Cumulus/gi,companyName],
+    [/cumulus.com/gi,companyURL],
+    [/Cumulus Financial/g,companyName],
+    [/Cumulus/g,companyName],
     [/Average Order Value/gi, "Average Premium"],
     [/Orders/gi, "Annual Renewals"],
 ];
@@ -319,6 +336,12 @@ $(document).ready(function () {
 
         if(isWebsite){
             /***************************************************************
+             * TOP LEVEL SECTION: This is the Personal & Corporate sections of the site. (Default is Personal, Corporate).
+             ***************************************************************/
+            $('#nav-personal').html(topLevelSection1);
+            $('#nav-corporate').html(topLevelSection2);
+
+            /***************************************************************
              * PRIMARY NAVIGATION: This is the Primary Page Navigation (Default is Banking, Credit Cards, Insurance, Investing, Loans, News).
              ***************************************************************/
             $('#nav-personal-banking > span').html(nav1);
@@ -347,6 +370,7 @@ $(document).ready(function () {
                 homepageHeroBannerSubTitleLine1 = homepageHeroBannerSubTitleLine1Personalized;
                 homepageHeroBannerSubTitleLine2 = homepageHeroBannerSubTitleLine2Personalized;
                 homepageHeroBannerCTAButtonLabel = homepageHeroBannerCTAButtonLabelPersonalized;
+                homepageHeroTextColor = homepageHeroTextColorPersonalized;
                 homepageHeroBannerDimensions = "height: 393px; width:1170px;";
             }
             if(homepageHeroBannerImage.trim()){
@@ -355,8 +379,12 @@ $(document).ready(function () {
             }
             $('#hp-banner-title1').html(homepageHeroBannerTitleLine1);
             $('#hp-banner-title2').html(homepageHeroBannerTitleLine2);
+            $('#hp-banner-title1').attr("style","fill: #"+homepageHeroTextColor+" !important;");
+            $('#hp-banner-title2').attr("style","fill: #"+homepageHeroTextColor+" !important;");
             $('#hp-banner-subtitle1').html(homepageHeroBannerSubTitleLine1);
             $('#hp-banner-subtitle2').html(homepageHeroBannerSubTitleLine2);
+            $('#hp-banner-subtitle1').attr("style","fill: #"+homepageHeroTextColor+" !important;");
+            $('#hp-banner-subtitle2').attr("style","fill: #"+homepageHeroTextColor+" !important;");
             $('#hp-banner-cta').html(homepageHeroBannerCTAButtonLabel);
 
             /***************************************************************
@@ -412,6 +440,17 @@ $(document).ready(function () {
                 $('#hp-blog-3-title').html(homepageRecommendations4Title);
                 $('#hp-blog-3-detail').html(homepageRecommendations4Detail);
                 $('#hp-blog-3-cta-label').html(homepageRecommendations4CTALabel);
+            }
+
+            /***************************************************************
+             * (FAKE) SOCIAL FACEBOOK AD
+             ***************************************************************/
+            if(window.location.pathname.indexOf("/social/facebook") > -1){
+                $('#fbAdLogo').attr("src", facebookAdLogo);
+                $('#fbAdTitle').html(facebookAdTitle);
+                $('#fbAdImage').attr("src", facebookAdBanner);
+                $('#fbAdTeaser').html(facebookAdTeaser);
+                $('#fbAdDescription').html(facebookAdDescription);
             }
 
             /***************************************************************
