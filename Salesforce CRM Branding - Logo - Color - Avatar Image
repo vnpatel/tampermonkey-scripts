@@ -1,0 +1,113 @@
+
+// ==UserScript==
+// @name         Salesforce CRM Branding - Logo, Color, Avatar Image
+// @author       Viral Patel
+// @match        https://*.force.com/*
+// @exclude      https://org62.lightning.force.com/*
+// @grant        none
+// ==/UserScript==
+
+    /**
+     ** UPDATE LOGO HERE: this logoURL variable with the appropriate logo URL for your presentation.
+     ** brandColorHexCode: select the dominant brand color
+     ** logoURL: customer's logo URL
+     ** [Optional] avatarURL: avatar picture URL
+     **
+     ** Example:
+     **  var brandColorHexCode = "2A94D6"; // do NOT include the leading # sign.
+     **  var logoURL = "https://image.s4.sfmc-content.com/lib/fe9115747462027476/m/1/003c6a6a-9e6a-40c1-977d-7b24e56abb7e.png";
+     **/
+
+    var brandColorHexCode = "FC2A2A"; /*** do NOT include the leading # sign. */
+    var logoURL = "https://image.s4.sfmc-content.com/lib/fe95157477610d7f76/m/1/c9425508-a92d-4307-969c-d27275df9c52.png";
+    var avatarURL = "https://fins-ido.s3.us-east-2.amazonaws.com/Banking+%26+Wealth/Rachel+Morris.png";
+
+var replaceArry = [
+
+    /**
+     ** START - UPDATE STRING REPLACEMENTS HERE
+     ** Add strings into the replacement array in the form of
+     ** [/String to find/gi,'String to replace'],
+     **/
+        [/Replace This/gi,'With This'],
+        [/Campaign/gi,'Journey'],
+    /**
+     ** END - UPDATE STRING REPLACEMENTS HERE
+     **/
+];
+
+
+/* ----------- DO NOT EDIT BELOW ----------- */
+
+var numTerms = replaceArry.length;
+var transTimer = setInterval (translateTermsOnPage, 200);
+
+function translateTermsOnPage () {
+
+
+    if(document.getElementsByClassName('slds-global-header__logo').length){
+        clearInterval(222);
+        document.getElementsByClassName('slds-global-header__logo')[0].setAttribute('style', 'background-image: url('+logoURL+');');
+        if(document.getElementsByClassName('slds-context-bar').length){
+            document.getElementsByClassName('slds-context-bar')[0].setAttribute('style', 'border-bottom-color: #'+brandColorHexCode+';');
+        }
+        if(document.getElementsByClassName('header-image').length){
+            document.getElementsByClassName('header-image')[0].setAttribute('style', 'background-color: #'+brandColorHexCode+';');
+        }
+
+    }
+
+
+
+    var txtWalker = document.createTreeWalker (
+        document.body,
+        NodeFilter.SHOW_TEXT, {
+            acceptNode: function (node) {
+                if (node.nodeValue.trim() ) {
+                    if (node.tmWasProcessed){
+                        return NodeFilter.FILTER_SKIP;
+                    }
+                    else{
+                        return NodeFilter.FILTER_ACCEPT;
+
+                    }
+                }
+                return NodeFilter.FILTER_SKIP;
+            }
+        },
+        false
+    );
+    var txtNode = null;
+    while (txtNode = txtWalker.nextNode()) {
+        txtNode.nodeValue = replaceAllTerms (txtNode.nodeValue);
+        txtNode.tmWasProcessed = true;
+    }
+    var placeholderNodes = document.querySelectorAll ("[placeholder]");
+    replaceManyAttributeTexts (placeholderNodes, "placeholder");
+
+    var titleNodes = document.querySelectorAll ("[title]");
+    replaceManyAttributeTexts (titleNodes, "title");
+
+    if(document.getElementsByClassName('customer-avatar').length){
+        document.getElementsByClassName('customer-avatar')[0].setAttribute('src', avatarURL);
+    }
+
+}
+
+function replaceAllTerms (oldTxt) {
+    for (var J = 0; J < numTerms; J++) {
+        oldTxt = oldTxt.replace (replaceArry[J][0], replaceArry[J][1]);
+    }
+    return oldTxt;
+}
+
+function replaceManyAttributeTexts (nodeList, attributeName) {
+    for (var J = nodeList.length - 1; J >= 0; --J) {
+        var node = nodeList[J];
+        var oldText = node.getAttribute (attributeName);
+        if (oldText) {
+            oldText = replaceAllTerms (oldText);
+            node.setAttribute (attributeName, oldText);
+        }
+    }
+}
