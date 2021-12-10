@@ -9,8 +9,8 @@
 // @require https://gist.github.com/raw/2625891/waitForKeyElements.js
 // ==/UserScript==
 
-var companyLogoURL = "https://image.s4.sfmc-content.com/lib/fe95157477610d7f76/m/1/c9425508-a92d-4307-969c-d27275df9c52.png"; // optional - this will be used to swap default SF logo in CRM/FSC.
-var companyPrimaryColor = "FC2A2A"; // optional - do NOT include the leading # sign. This will be used to swap the default color in CRM/FSC.
+var companyLogoURL = ""; // optional - this will be used to swap default SF logo in CRM/FSC.
+var companyPrimaryColor = ""; // optional - do NOT include the leading # sign. This will be used to swap the default color in CRM/FSC.
 var crmAppName = "Marketing"; // optional - this is the CRM/FSC app name that you'd like to use.  Default is "Cumulus - Marketing".
 var avatarURL = "https://fins-ido.s3.us-east-2.amazonaws.com/Banking+%26+Wealth/Rachel+Morris.png"; // optional - this is an optional persona image.
 
