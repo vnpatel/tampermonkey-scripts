@@ -1,0 +1,174 @@
+/* ----------- DO NOT EDIT BELOW ----------- */
+// ==UserScript==
+// @name         IS NBA in CRM
+// @version      1.0
+// @author       Viral Patel
+// @match        https://*.lightning.force.com/*
+// @exclude      https://*org62*/*
+// @require https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
+// @require https://gist.github.com/raw/2625891/waitForKeyElements.js
+// ==/UserScript==
+
+var companyLogoURL = "https://image.s4.sfmc-content.com/lib/fe95157477610d7f76/m/1/c9425508-a92d-4307-969c-d27275df9c52.png"; // optional - this will be used to swap default SF logo in CRM/FSC.
+var companyPrimaryColor = "FC2A2A"; // optional - do NOT include the leading # sign. This will be used to swap the default color in CRM/FSC.
+var crmAppName = "Marketing"; // optional - this is the CRM/FSC app name that you'd like to use.  Default is "Cumulus - Marketing".
+var avatarURL = "https://fins-ido.s3.us-east-2.amazonaws.com/Banking+%26+Wealth/Rachel+Morris.png"; // optional - this is an optional persona image.
+
+
+/***************************************************************
+ * Website: HOME PAGE RECOMMENDATIONS (Personalized)
+ ***************************************************************/
+var homepageRecommendations1Image = "https://cumulus-fs.s3.amazonaws.com/images/Cryptocurrency-blog-01.png"; //optional: Leave it blank if you don't want to update this image.
+var homepageRecommendations1Title = "10 Reasons to Buy Crypto";
+var homepageRecommendations1Detail = "Crypto is changing the world. We have 10 reasons to think why it is the future of money.";
+var homepageRecommendations1CTALabel = "Learn More";
+
+var homepageRecommendations2Image = "https://cumulus-fs.s3.amazonaws.com/images/Cryptocurrency-blog-02.png"; //optional: Leave it blank if you don't want to update this image.
+var homepageRecommendations2Title = "Buy Bitcoin with Apple Pay";
+var homepageRecommendations2Detail = "We are at the forefront of financial revolution. Now, you can purchase bitcoin from your mobile phone.";
+var homepageRecommendations2CTALabel = "Learn More";
+
+var homepageRecommendations3Image = "https://cumulus-fs.s3.amazonaws.com/images/Cryptocurrency-blog-03.png"; //optional: Leave it blank if you don't want to update this image.
+var homepageRecommendations3Title = "Buying Ethereum & Other Crypto";
+var homepageRecommendations3Detail = "Buying Bitcoin is easy. Want to learn how to buy other digital currency?";
+var homepageRecommendations3CTALabel = "Explore";
+
+var homepageRecommendations4Image = "https://cumulus-fs.s3.amazonaws.com/images/Cryptocurrency-blog-04.png"; //optional: Leave it blank if you don't want to update this image.
+var homepageRecommendations4Title = "Glorious Guide to NFT";
+var homepageRecommendations4Detail = "Recently, tech industry started experimenting with digital collectibles on Ethereum.";
+var homepageRecommendations4CTALabel = "Learn More";
+
+
+/***************************************************************
+ * IS: RECS IMAGES FOR RECIPE PREVIEW/SIMULATION SCREEN
+ ***************************************************************/
+///By default these 4 images are the same as the homepage recs.  Feel free to replace them with different image URLs, if necessary.
+var productRec1image = homepageRecommendations1Image;
+var productRec2image = homepageRecommendations2Image;
+var productRec3image = homepageRecommendations3Image;
+var productRec4image = homepageRecommendations4Image;
+
+/***************************************************************
+ * Optional: Any Free Text Replacements
+ ***************************************************************/
+var replaceArry = [
+    [/Average Order Value/gi, "Average Balance"],
+    [/Orders/gi, "Annual Balance"],
+];
+
+
+function addGlobalStyle(css) {
+   var head, style;
+   head = document.getElementsByTagName('head')[0];
+   if (!head) { return; }
+   style = document.createElement('style');
+   style.type = 'text/css';
+   style.innerHTML = css;
+   head.appendChild(style);
+}
+//addGlobalStyle('.gender-affinities { display: none; }');
+//addGlobalStyle('#pdp-promo3 { background-image: url("https://image.s4.sfmc-content.com/lib/fe36117276640479751c73/m/1/f4cddb17-a257-42df-8148-69830cab2e48.png");  height: 314px; width: 1036px; margin: 0 auto; }');
+
+var numTerms    = replaceArry.length;
+var transTimer  = setInterval (translateTermsOnPage, 222);
+
+function translateTermsOnPage () {
+    var txtWalker   = document.createTreeWalker (
+        document.body,
+        NodeFilter.SHOW_TEXT, {
+            acceptNode: function (node) {
+                if (node.nodeValue.trim() ) {
+                    if (node.tmWasProcessed)
+                        return NodeFilter.FILTER_SKIP;
+                    else
+                        return NodeFilter.FILTER_ACCEPT;
+                }
+                return NodeFilter.FILTER_SKIP;
+            }
+        },
+        false
+    );
+    var txtNode     = null;
+    while (txtNode  = txtWalker.nextNode()) {
+        txtNode.nodeValue       = replaceAllTerms (txtNode.nodeValue);
+        txtNode.tmWasProcessed  = true;
+    }
+    var placeholderNodes = document.querySelectorAll ("[placeholder]");
+}
+
+function replaceAllTerms (oldTxt) {
+    for (var J  = 0;  J < numTerms;  J++) {
+        oldTxt  = oldTxt.replace (replaceArry[J][0], replaceArry[J][1]);
+    }
+    return oldTxt;
+}
+
+const crmISRecsTitles = [homepageRecommendations1Title, homepageRecommendations2Title, homepageRecommendations3Title, homepageRecommendations4Title];
+const crmISRecsDetails = [homepageRecommendations1Detail, homepageRecommendations2Detail, homepageRecommendations3Detail, homepageRecommendations4Detail];
+const crmISRecsImages = [homepageRecommendations1Image, homepageRecommendations2Image, homepageRecommendations3Image, homepageRecommendations4Image];
+function replaceCRMISRecommendations(i){
+    var crmTag = $('#brandBand_2 > div > div').find('.custom-header:eq('+i+')');
+    if(crmTag){
+        crmTag.html(crmISRecsTitles[i]);
+    }
+    crmTag = $('#brandBand_2 > div > div').find('.slds-p-left_x-small:eq('+i+') > span');
+    if(crmTag){
+        crmTag.html(crmISRecsDetails[i]);
+    }
+    if(crmISRecsImages[i].trim()){
+        crmTag = $('#brandBand_2 > div > div').find('.imageBox:eq('+i+')');
+        if(crmTag){
+            crmTag.attr("src", crmISRecsImages[i]);
+        }
+    }
+}
+
+var $ = window.jQuery;
+$(document).ready(function () {
+    let checkFunction = function(){
+       if($('.navbar-header').length > 0){
+           //document.getElementById("side-bar-nav").style = "background-color:#E8E5DE;";
+           clearInterval(this);
+       }
+    }
+    var checkForLogoInterval = setInterval(checkFunction, 200);
+
+    function replaceContent () {
+
+        //product page
+        if($('#pageExceptFooter .breadcrumb li:eq(0) span').html() == "Catalog"){
+            document.title = product1name;
+        }
+        var isCRM = false;
+        if(window.location.hostname.indexOf("lightning.force.com") > -1){
+            isCRM = true;
+        }
+
+        if(isCRM){
+            if(companyLogoURL.trim()){
+                $('.slds-global-header__logo').attr("style", 'background-image: url('+companyLogoURL+');');
+            }
+            if(companyPrimaryColor.trim()){
+                $('.slds-context-bar').attr("style", 'border-bottom-color: #'+companyPrimaryColor+';');
+            }
+            if(crmAppName.trim()){
+                $('.appName > span').html(crmAppName);
+            }
+
+            if(avatarURL.trim() && document.getElementsByClassName('customer-avatar').length){
+                document.getElementsByClassName('customer-avatar')[0].setAttribute('src', avatarURL);
+            }
+
+             /***************************************************************
+             * CRM: IS Next Best Recommendations
+             ***************************************************************/
+            if($('#brandBand_2 > div > div').find('.custom-header').length > 0){
+                replaceCRMISRecommendations(0);
+                replaceCRMISRecommendations(1);
+                replaceCRMISRecommendations(2);
+                replaceCRMISRecommendations(3);
+            }
+        }
+    }
+    var imgTimer = setInterval(replaceContent, 200);
+})();
