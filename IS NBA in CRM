@@ -121,6 +121,11 @@ function replaceCRMISRecommendations(i){
             crmTag.attr("src", crmISRecsImages[i]);
         }
     }
+    crmTag = $('#brandBand_2 > div > div').find('.slds-avatar_medium:eq(0) > img');
+    if(crmTag){
+        crmTag.attr('src', avatarURL);
+    }
+
 }
 
 var $ = window.jQuery;
