@@ -54,6 +54,11 @@ function translateTermsOnPage () {
         if(document.getElementsByClassName('header-image').length){
             document.getElementsByClassName('header-image')[0].setAttribute('style', 'background-color: #'+brandColorHexCode+';');
         }
+        
+        var crmTag = $('#brandBand_2 > div > div').find('.slds-avatar_medium:eq(0) > img');
+        if(crmTag){
+            crmTag.attr('src', avatarURL);
+        }
 
     }
 
