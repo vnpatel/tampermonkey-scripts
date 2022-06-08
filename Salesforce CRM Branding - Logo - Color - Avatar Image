@@ -2,9 +2,12 @@
 // ==UserScript==
 // @name         Salesforce CRM Branding - Logo, Color, Avatar Image
 // @author       Viral Patel
+// @version      1.0
+// @description  Salesforce CRM Branding - Logo, Color, Avatar Image
 // @match        https://*.force.com/*
 // @exclude      https://org62.lightning.force.com/*
 // @grant        none
+// @require https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // ==/UserScript==
 
     /**
