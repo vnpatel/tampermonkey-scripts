@@ -1,0 +1,268 @@
+// ==UserScript==
+// @name         autoCumulus Golden Rachel Profile Customizer
+// @author       Viral Patel
+// @version      1.0
+// @description  Last updated April 13, 2026
+// @namespace    http://tampermonkey.net/
+// @match        https://*.lightning.force.com/*
+// @match        https://*.salesforce.com/*
+// @exclude      https://org62.lightning.force.com/*
+// @grant        none
+// @run-at       document-idle
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    // === SECTION 1: TBD ======================================================
+    // Placeholder for future configuration needs.
+    // =========================================================================
+    const TBD_CONFIG = {};
+
+    // === SECTION 2: SUMMARY BAR ==============================================
+    // Controls the top metric cards (Assets, Liabilities, Net Worth, etc.)
+    // Note: Items replace existing cards only if the card is present on screen.
+    // =========================================================================
+    const SUMMARY_METRICS = [
+        /**** Summary Card 1 ****/
+        { label: "Assets", value: "$1,326,969", comment: "6 Accounts" },
+        /**** Summary Card 2 ****/
+        { label: "Liabilities", value: "$219,180", comment: "5 Accounts" },
+        /**** Summary Card 3 ****/
+        { label: "Net Worth", value: "$1,107,789", comment: "Calculated Insight" },
+        /**** Summary Card 4 ****/
+        { label: "Policies", value: "$761,876", comment: "2 Active (Coverage)" }
+    ];
+
+    // === SECTION 3: AI INSIGHTS ==============================================
+    // Controls the vertical insight rows usually found in the sidebar.
+    // Note: Replaces up to 3 existing insights.
+    // =========================================================================
+    const AI_INSIGHTS = [
+        /**** AI Insight 1 ****/
+        { pill: "AI Analysis", title: "Retirement Readiness High", description: "Client is currently at <strong class='text-bold'>92%</strong> of their goal." },
+        /**** AI Insight 2 ****/
+        { pill: "Opportunity", title: "Estate Planning Gap", description: "No updated will on file. AI suggests a <strong class='text-bold'>Trust Review</strong>." },
+        /**** AI Insight 3 ****/
+        { pill: "Alert", title: "Tax Liability Warning", description: "Estimated <strong class='text-bold'>$12K</strong> impact due to recent capital gains." }
+    ];
+
+    // === SECTION 4: DIRECT ACTIONS / NBA =====================================
+    // Controls the "Next Best Action" cards.
+    // Note: Replaces up to 4 cards. Arrow (→) is added automatically.
+    // =========================================================================
+    const DIRECT_ACTION_CARDS = [
+        { title: "Boost 401K Savings", description: "Increase contribution by 2% to maximize employer match.", cta: "Adjust Contribution" },
+        { title: "Wealth Management Review", description: "Schedule a quarterly review for portfolio rebalancing.", cta: "Schedule Now" }
+    ];
+
+    // === SECTION 5: JOURNEYS =================================================
+    // Controls the Marketing Journey cards.
+    // Note: Replaces up to 2 journeys.
+    // =========================================================================
+    const MARKETING_JOURNEYS = [
+        { tag: "Nurture", title: "Lead Nurture - 529 Plan", description: "Client recently browsed '529 Education Savings Plan'." },
+        { tag: "Cross-Sell", title: "High Yield Savings Promotion", description: "Qualify for premium savings rates." }
+    ];
+
+    // === SECTION 6: ACTIVITY TIMELINE ========================================
+    // Controls the items in the Activity Timeline.
+    // Note: Replaces up to 7 activities if they exist on the page.
+    // =========================================================================
+    const ACTIVITY_TIMELINE_ITEMS = [
+        /**** Timeline Item 1 ****/
+        { isFuture: false, icon: "", title: "529 Plan Consultation", description: "Discussed college savings targets.", timestamp: "7:25 AM • Today" },
+        /**** Timeline Item 2 ****/
+        { isFuture: true, icon: "", title: "Follow-up: Trust Docs", description: "RM to review beneficiary adjustments.", timestamp: "11:59 PM • Tomorrow" }
+    ];
+
+    // === SECTION 7: ENGAGEMENT INSIGHTS ======================================
+    // Controls Category blocks, Heatmaps, and Product Tags.
+    // =========================================================================
+    const ENGAGEMENT_INSIGHTS = [
+        {
+            name: "Insurance",
+            totalInteractions: "85",
+            heatmap: { date: "2026-04-10", count: 12 },
+            products: [
+                { name: "Auto Insurance", count: "40" },
+                { name: "Life Insurance", count: "25" }
+            ]
+        }
+    ];
+
+    // === SECTION 8: RELATIONSHIP HEALTH ======================================
+    // Controls the Attrition Likelihood slider and Top Predictors.
+    // =========================================================================
+    const RELATIONSHIP_HEALTH_METRICS = {
+        title: "Attrition Likelihood",
+        probability: "15%",
+        predictors: [
+            { status: "green", name: "Has Goals", value: "Yes", impact: "-10.8%" },
+            { status: "red", name: "Tenure", value: "20.9 Yrs", impact: "+6.5%" },
+            { status: "green", name: "Yearly Income", value: "$202,053", impact: "-12.8%" }
+        ]
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /**********************************************************************
+     * STOP : STOP : STOP !!!!!!!                                         *
+     * DO NOT EDIT ANYTHING BELOW THIS LINE                               *
+     **********************************************************************/
+
+    const SETTINGS = {
+        insightRow: 'div.insight-row',
+        timelineRow: 'li.timeline-item',
+        healthContainer: 'div.health-container',
+        categoryBlock: 'div.category-block',
+        cardsGrid: 'div.cards-grid',
+        journeyCard: 'div.journey-card',
+        summaryBar: 'div.summary-bar',
+        interval: 2000
+    };
+
+    function findDeep(selector, root = document) {
+        let elements = Array.from(root.querySelectorAll(selector));
+        const shadowHosts = root.querySelectorAll('*');
+        for (const host of shadowHosts) {
+            if (host.shadowRoot) elements = elements.concat(findDeep(selector, host.shadowRoot));
+        }
+        return elements;
+    }
+
+    function updateElement(parent, selector, newValue) {
+        if (!newValue || !parent) return;
+        const el = parent.querySelector(selector);
+        if (el && el.innerHTML !== newValue) el.innerHTML = newValue;
+    }
+
+    function processInsights() {
+        const els = findDeep(SETTINGS.insightRow);
+        els.forEach((el, i) => {
+            if (AI_INSIGHTS[i]) {
+                updateElement(el, '.pill', AI_INSIGHTS[i].pill);
+                updateElement(el, '.insight-title', AI_INSIGHTS[i].title);
+                updateElement(el, '.logic-text', AI_INSIGHTS[i].description);
+            }
+        });
+    }
+
+    function processSummary() {
+        findDeep(SETTINGS.summaryBar).forEach(bar => {
+            const cards = bar.querySelectorAll('.summary-card');
+            cards.forEach((card, i) => {
+                if (SUMMARY_METRICS[i]) {
+                    updateElement(card, '.metric-label', SUMMARY_METRICS[i].label);
+                    updateElement(card, '.metric-val', SUMMARY_METRICS[i].value);
+                    updateElement(card, '.metric-sub', SUMMARY_METRICS[i].comment);
+                }
+            });
+        });
+    }
+
+    function processTimeline() {
+        findDeep(SETTINGS.timelineRow).forEach((item, i) => {
+            if (ACTIVITY_TIMELINE_ITEMS[i]) {
+                const d = ACTIVITY_TIMELINE_ITEMS[i];
+                if (d.isFuture) item.classList.add('future-item'); else item.classList.remove('future-item');
+                updateElement(item, '.activity-name', d.title);
+                updateElement(item, '.activity-details', d.description);
+                const timeSpan = item.querySelector('.timestamp');
+                if (timeSpan && d.timestamp) {
+                    const clock = timeSpan.querySelector('svg.clock-icon');
+                    timeSpan.innerHTML = clock ? (clock.outerHTML + ' ' + d.timestamp) : d.timestamp;
+                }
+            }
+        });
+    }
+
+    function processHealth() {
+        findDeep(SETTINGS.healthContainer).forEach(container => {
+            const d = RELATIONSHIP_HEALTH_METRICS;
+            updateElement(container, '.metric-label', d.title);
+            const marker = container.querySelector('.slider-marker');
+            if (marker) {
+                marker.style.left = d.probability;
+                const valDiv = marker.querySelector('.marker-value');
+                if (valDiv) valDiv.innerText = d.probability;
+            }
+            container.querySelectorAll('.predictor-block .data-row').forEach((row, i) => {
+                if (d.predictors[i]) {
+                    const p = d.predictors[i];
+                    const ind = row.querySelector('.indicator');
+                    if (ind) { ind.className = `indicator ${p.status}`; ind.innerText = (p.status === 'green' ? '▼' : '▲'); }
+                    const content = row.querySelector('.row-content');
+                    if (content) content.innerHTML = `${p.name}: <b>${p.value}</b>`;
+                    const impact = row.querySelector('.impact-val');
+                    if (impact) { impact.className = `impact-val ${p.status}`; impact.innerText = p.impact; }
+                }
+            });
+        });
+    }
+
+    function processEngagement() {
+        findDeep(SETTINGS.categoryBlock).forEach((block, i) => {
+            if (ENGAGEMENT_INSIGHTS[i]) {
+                const d = ENGAGEMENT_INSIGHTS[i];
+                updateElement(block, '.category-name', d.name);
+                updateElement(block, '.visit-pill', `${d.totalInteractions} interactions`);
+                if (d.heatmap && d.heatmap.date) {
+                    const cell = block.querySelector(`.heatmap-cell[title^="${d.heatmap.date}"]`);
+                    if (cell) {
+                        cell.style.backgroundColor = block.querySelector('.category-indicator').style.backgroundColor;
+                        cell.style.opacity = "1.0";
+                        cell.title = `${d.heatmap.date}: ${d.heatmap.count} interactions`;
+                    }
+                }
+                const tagEls = block.querySelectorAll('.product-tag');
+                if (d.products) d.products.forEach((p, pi) => {
+                    if (tagEls[pi]) { updateElement(tagEls[pi], '.product-name', p.name); updateElement(tagEls[pi], '.product-count', p.count); }
+                });
+            }
+        });
+    }
+
+    function processActionCards() {
+        findDeep(SETTINGS.cardsGrid).forEach(grid => {
+            grid.querySelectorAll('.action-card').forEach((card, i) => {
+                if (DIRECT_ACTION_CARDS[i]) {
+                    updateElement(card, 'h4', DIRECT_ACTION_CARDS[i].title);
+                    updateElement(card, 'p', DIRECT_ACTION_CARDS[i].description);
+                    updateElement(card, 'a.action-link', `${DIRECT_ACTION_CARDS[i].cta} →`);
+                }
+            });
+            grid.querySelectorAll('.journey-card').forEach((card, i) => {
+                if (MARKETING_JOURNEYS[i]) {
+                    updateElement(card, '.journey-tag', MARKETING_JOURNEYS[i].tag);
+                    updateElement(card, 'h3', MARKETING_JOURNEYS[i].title);
+                    updateElement(card, 'p', MARKETING_JOURNEYS[i].description);
+                }
+            });
+        });
+    }
+
+    setInterval(() => {
+        try {
+            processInsights();
+            processSummary();
+            processTimeline();
+            processHealth();
+            processEngagement();
+            processActionCards();
+        } catch (e) { /* Fail Silently */ }
+    }, SETTINGS.interval);
+
+})();
