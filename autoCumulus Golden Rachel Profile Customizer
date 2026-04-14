@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         autoCumulus Golden Rachel Profile Customizer
 // @author       Viral Patel
-// @version      1.0
-// @description  Last updated April 13, 2026
+// @version      1.1
+// @description  Now with reactive radial dials. Updated April 14, 2026
 // @namespace    http://tampermonkey.net/
-// @match        https://*.lightning.force.com/*
-// @match        https://*.salesforce.com/*
-// @exclude      https://org62.lightning.force.com/*
+// @match         https://*.lightning.force.com/*
+// @match         https://*.salesforce.com/*
+// @exclude       https://org62.lightning.force.com/*
 // @grant        none
 // @run-at       document-idle
 // ==/UserScript==
@@ -14,86 +14,76 @@
 (function() {
     'use strict';
 
-    // === SECTION 1: TBD ======================================================
-    // Placeholder for future configuration needs.
-    // =========================================================================
-    const TBD_CONFIG = {};
+    // === SECTION 1: CLIENT CARD ==============================================
+    const CLIENT_CARD_CONFIG = {
+        name: "*Rachel G Adams",
+        loyaltyTier: { label: "Loyalty Tier", value: "*Gold" },
+        lifetimeValue: { label: "Lifetime Relationship Value", value: "$285,476.36" },
+        segments: "High Spender; High Net Worth; Under-Insured HNW; Household with Children; Multi-Product Client",
+        attrition: { label: "Attrition Likelihood", value: "75%" }, // Dial will move to 15%
+        engagement: { label: "Engagement Score", value: "92%" } // Dial will move to 92%
+    };
+
+    // ... (Sections 2 through 8 remain as previously configured) ...
 
     // === SECTION 2: SUMMARY BAR ==============================================
-    // Controls the top metric cards (Assets, Liabilities, Net Worth, etc.)
-    // Note: Items replace existing cards only if the card is present on screen.
-    // =========================================================================
     const SUMMARY_METRICS = [
-        /**** Summary Card 1 ****/
         { label: "Assets", value: "$1,326,969", comment: "6 Accounts" },
-        /**** Summary Card 2 ****/
         { label: "Liabilities", value: "$219,180", comment: "5 Accounts" },
-        /**** Summary Card 3 ****/
         { label: "Net Worth", value: "$1,107,789", comment: "Calculated Insight" },
-        /**** Summary Card 4 ****/
         { label: "Policies", value: "$761,876", comment: "2 Active (Coverage)" }
     ];
 
     // === SECTION 3: AI INSIGHTS ==============================================
-    // Controls the vertical insight rows usually found in the sidebar.
-    // Note: Replaces up to 3 existing insights.
-    // =========================================================================
-    const AI_INSIGHTS = [
-        /**** AI Insight 1 ****/
-        { pill: "AI Analysis", title: "Retirement Readiness High", description: "Client is currently at <strong class='text-bold'>92%</strong> of their goal." },
-        /**** AI Insight 2 ****/
-        { pill: "Opportunity", title: "Estate Planning Gap", description: "No updated will on file. AI suggests a <strong class='text-bold'>Trust Review</strong>." },
-        /**** AI Insight 3 ****/
-        { pill: "Alert", title: "Tax Liability Warning", description: "Estimated <strong class='text-bold'>$12K</strong> impact due to recent capital gains." }
-    ];
+    const AI_INSIGHTS_CONFIG = {
+        title: "*AI Insights",
+        items: [
+            { pill: "AI Analysis", title: "Retirement Readiness High", description: "Client is currently at <strong class='text-bold'>92%</strong> of their goal." },
+            { pill: "Opportunity", title: "Estate Planning Gap", description: "No updated will on file. AI suggests a <strong class='text-bold'>Trust Review</strong>." },
+            { pill: "Alert", title: "Tax Liability Warning", description: "Estimated <strong class='text-bold'>$12K</strong> impact due to recent capital gains." }
+        ]
+    };
 
     // === SECTION 4: DIRECT ACTIONS / NBA =====================================
-    // Controls the "Next Best Action" cards.
-    // Note: Replaces up to 4 cards. Arrow (→) is added automatically.
-    // =========================================================================
-    const DIRECT_ACTION_CARDS = [
-        { title: "Boost 401K Savings", description: "Increase contribution by 2% to maximize employer match.", cta: "Adjust Contribution" },
-        { title: "Wealth Management Review", description: "Schedule a quarterly review for portfolio rebalancing.", cta: "Schedule Now" }
-    ];
+    const DIRECT_ACTIONS_CONFIG = {
+        title: "*Direct Actions",
+        items: [
+            { title: "*Increase 401K Contributions", description: "Maximize contributions to close the retirement savings gap.", cta: "Discuss Options" },
+            { title: "*Explore High Yield Savings", description: "Transition idle cash to a high yield savings account for better returns.", cta: "Present Offer" },
+            { title: "*Review Student Loan Options", description: "Investigate refinancing options to reduce monthly payments.", cta: "Discuss Options" },
+            { title: "*Mutual Fund Selection", description: "Professional fund management across diverse asset classes.", cta: "View Funds" }
+        ]
+    };
 
     // === SECTION 5: JOURNEYS =================================================
-    // Controls the Marketing Journey cards.
-    // Note: Replaces up to 2 journeys.
-    // =========================================================================
-    const MARKETING_JOURNEYS = [
-        { tag: "Nurture", title: "Lead Nurture - 529 Plan", description: "Client recently browsed '529 Education Savings Plan'." },
-        { tag: "Cross-Sell", title: "High Yield Savings Promotion", description: "Qualify for premium savings rates." }
-    ];
+    const MARKETING_JOURNEYS_CONFIG = {
+        title: "*Strategic Journeys",
+        items: [
+            { tag: "Nurture", title: "*Lead Nurture - Financial Health Checkup", description: "Encourages clients to complete a financial health checkup for personalized insights." },
+            { tag: "Cross-Sell", title: "*High Yield Savings Promotion", description: "Client is behind on retirement savings and needs education." }
+        ]
+    };
 
     // === SECTION 6: ACTIVITY TIMELINE ========================================
-    // Controls the items in the Activity Timeline.
-    // Note: Replaces up to 7 activities if they exist on the page.
-    // =========================================================================
-    const ACTIVITY_TIMELINE_ITEMS = [
-        /**** Timeline Item 1 ****/
-        { isFuture: false, icon: "", title: "529 Plan Consultation", description: "Discussed college savings targets.", timestamp: "7:25 AM • Today" },
-        /**** Timeline Item 2 ****/
-        { isFuture: true, icon: "", title: "Follow-up: Trust Docs", description: "RM to review beneficiary adjustments.", timestamp: "11:59 PM • Tomorrow" }
-    ];
+    const ACTIVITY_TIMELINE_CONFIG = {
+        title: "*Activity Timeline",
+        items: [
+            { isFuture: true, title: "Send Documents", description: "Task: Outbound quote from RM.", timestamp: "11:59 PM • Apr 22" },
+            { isFuture: true, title: "Retirement Portfolio", description: "Meeting: Face-to-face consultation.", timestamp: "4:00 PM • Tomorrow" },
+            { isFuture: false, title: "Mutual Funds", description: "Web: Explored investing product(s).", timestamp: "Yesterday" }
+        ]
+    };
 
     // === SECTION 7: ENGAGEMENT INSIGHTS ======================================
-    // Controls Category blocks, Heatmaps, and Product Tags.
-    // =========================================================================
-    const ENGAGEMENT_INSIGHTS = [
-        {
-            name: "Insurance",
-            totalInteractions: "85",
-            heatmap: { date: "2026-04-10", count: 12 },
-            products: [
-                { name: "Auto Insurance", count: "40" },
-                { name: "Life Insurance", count: "25" }
-            ]
-        }
-    ];
+    const ENGAGEMENT_INSIGHTS_CONFIG = {
+        title: "*Engagement Insights",
+        categories: [
+            { name: "Insurance", totalInteractions: "85", heatmap: { date: "2026-04-10", count: 12 }, products: [{ name: "Auto Insurance", count: "40" }, { name: "Life Insurance", count: "25" }] },
+            { name: "Banking", totalInteractions: "42", heatmap: { date: "2026-04-13", count: 2 }, products: [{ name: "Standard Checking", count: "20" }, { name: "Standard Savings", count: "16" }] }
+        ]
+    };
 
     // === SECTION 8: RELATIONSHIP HEALTH ======================================
-    // Controls the Attrition Likelihood slider and Top Predictors.
-    // =========================================================================
     const RELATIONSHIP_HEALTH_METRICS = {
         title: "Attrition Likelihood",
         probability: "15%",
@@ -104,32 +94,19 @@
         ]
     };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**********************************************************************
      * STOP : STOP : STOP !!!!!!!                                         *
-     * DO NOT EDIT ANYTHING BELOW THIS LINE                               *
      **********************************************************************/
 
     const SETTINGS = {
-        insightRow: 'div.insight-row',
+        clientCardHost: 'c-cumulus-client-card',
+        insightCard: '.insights-card',
+        timelineTab: '.slds-tabs_default__link',
         timelineRow: 'li.timeline-item',
         healthContainer: 'div.health-container',
-        categoryBlock: 'div.category-block',
-        cardsGrid: 'div.cards-grid',
-        journeyCard: 'div.journey-card',
+        affinityCard: '.affinity-card',
+        actionCompID: '[data-component-id="c_cumulusClientRecommendedActions"]',
+        journeyCompID: '[data-component-id="c_cumulusJourneyRecommendation"]',
         summaryBar: 'div.summary-bar',
         interval: 2000
     };
@@ -138,7 +115,9 @@
         let elements = Array.from(root.querySelectorAll(selector));
         const shadowHosts = root.querySelectorAll('*');
         for (const host of shadowHosts) {
-            if (host.shadowRoot) elements = elements.concat(findDeep(selector, host.shadowRoot));
+            if (host.shadowRoot) {
+                elements = elements.concat(findDeep(selector, host.shadowRoot));
+            }
         }
         return elements;
     }
@@ -146,24 +125,84 @@
     function updateElement(parent, selector, newValue) {
         if (!newValue || !parent) return;
         const el = parent.querySelector(selector);
-        if (el && el.innerHTML !== newValue) el.innerHTML = newValue;
+        if (el && el.innerHTML !== newValue) {
+            el.innerHTML = newValue;
+        }
     }
 
-    function processInsights() {
-        const els = findDeep(SETTINGS.insightRow);
-        els.forEach((el, i) => {
-            if (AI_INSIGHTS[i]) {
-                updateElement(el, '.pill', AI_INSIGHTS[i].pill);
-                updateElement(el, '.insight-title', AI_INSIGHTS[i].title);
-                updateElement(el, '.logic-text', AI_INSIGHTS[i].description);
+    // Helper to calculate degrees for radial charts
+    function calculateDegrees(percentString) {
+        const val = parseInt(percentString.replace(/[^0-9]/g, '')) || 0;
+        return (val / 100) * 360;
+    }
+
+    function processClientCard() {
+        const hosts = findDeep(SETTINGS.clientCardHost);
+        hosts.forEach(host => {
+            const root = host.shadowRoot || host;
+            const config = CLIENT_CARD_CONFIG;
+
+            updateElement(root, '.client-name', config.name);
+            updateElement(root, '.loyalty-tier', `${config.loyaltyTier.label}: ${config.loyaltyTier.value}`);
+            updateElement(root, '.m-lbl', config.lifetimeValue.label);
+            updateElement(root, '.m-val', config.lifetimeValue.value);
+
+            // Reactive Dials (Radial Metrics)
+            const attrition = root.querySelector('[data-id="attrition"]');
+            if (attrition) {
+                updateElement(attrition, '.radial-val', config.attrition.value);
+                attrition.style.setProperty('--radial-deg', `${calculateDegrees(config.attrition.value)}deg`);
+                const lbl = attrition.parentElement.querySelector('.radial-lbl');
+                if (lbl) lbl.innerHTML = config.attrition.label;
             }
+
+            const engagement = root.querySelector('[data-id="engagement"]');
+            if (engagement) {
+                updateElement(engagement, '.radial-val', config.engagement.value);
+                engagement.style.setProperty('--radial-deg', `${calculateDegrees(config.engagement.value)}deg`);
+                const lbl = engagement.parentElement.querySelector('.radial-lbl');
+                if (lbl) lbl.innerHTML = config.engagement.label;
+            }
+
+            if (config.segments) {
+                const segList = config.segments.split(';').map(s => s.trim());
+                const tags = root.querySelectorAll('.tag');
+                segList.forEach((segText, i) => {
+                    if (tags[i]) {
+                        tags[i].innerHTML = segText;
+                        tags[i].title = segText;
+                    }
+                });
+            }
+        });
+    }
+
+    // ... (Remaining process functions from previous version) ...
+
+    function processInsights() {
+        findDeep(SETTINGS.insightCard).forEach(card => {
+            const headerTitle = card.querySelector('h2.header-title');
+            if (headerTitle) {
+                const icon = headerTitle.querySelector('lightning-icon');
+                const iconHtml = icon ? icon.outerHTML : '';
+                if (!headerTitle.innerText.includes(AI_INSIGHTS_CONFIG.title)) {
+                    headerTitle.innerHTML = iconHtml + AI_INSIGHTS_CONFIG.title;
+                }
+            }
+            card.querySelectorAll('div.insight-row').forEach((row, i) => {
+                const d = AI_INSIGHTS_CONFIG.items[i];
+                if (d) {
+                    updateElement(row, '.pill', d.pill);
+                    updateElement(row, '.insight-title', d.title);
+                    updateElement(row, '.logic-text', d.description);
+                }
+            });
         });
     }
 
     function processSummary() {
         findDeep(SETTINGS.summaryBar).forEach(bar => {
-            const cards = bar.querySelectorAll('.summary-card');
-            cards.forEach((card, i) => {
+            bar.querySelectorAll('.summary-card').forEach((card, i) => {
                 if (SUMMARY_METRICS[i]) {
                     updateElement(card, '.metric-label', SUMMARY_METRICS[i].label);
                     updateElement(card, '.metric-val', SUMMARY_METRICS[i].value);
@@ -174,9 +213,14 @@
     }
 
     function processTimeline() {
+        findDeep(SETTINGS.timelineTab).forEach(tab => {
+            if (tab.innerText.trim().includes("Timeline") && !tab.innerText.includes("*")) {
+                tab.innerText = ACTIVITY_TIMELINE_CONFIG.title;
+            }
+        });
         findDeep(SETTINGS.timelineRow).forEach((item, i) => {
-            if (ACTIVITY_TIMELINE_ITEMS[i]) {
-                const d = ACTIVITY_TIMELINE_ITEMS[i];
+            const d = ACTIVITY_TIMELINE_CONFIG.items[i];
+            if (d) {
                 if (d.isFuture) item.classList.add('future-item'); else item.classList.remove('future-item');
                 updateElement(item, '.activity-name', d.title);
                 updateElement(item, '.activity-details', d.description);
@@ -191,21 +235,19 @@
 
     function processHealth() {
         findDeep(SETTINGS.healthContainer).forEach(container => {
-            const d = RELATIONSHIP_HEALTH_METRICS;
-            updateElement(container, '.metric-label', d.title);
+            updateElement(container, '.metric-label', RELATIONSHIP_HEALTH_METRICS.title);
             const marker = container.querySelector('.slider-marker');
             if (marker) {
-                marker.style.left = d.probability;
+                marker.style.left = RELATIONSHIP_HEALTH_METRICS.probability;
                 const valDiv = marker.querySelector('.marker-value');
-                if (valDiv) valDiv.innerText = d.probability;
+                if (valDiv) valDiv.innerText = RELATIONSHIP_HEALTH_METRICS.probability;
             }
             container.querySelectorAll('.predictor-block .data-row').forEach((row, i) => {
-                if (d.predictors[i]) {
-                    const p = d.predictors[i];
+                const p = RELATIONSHIP_HEALTH_METRICS.predictors[i];
+                if (p) {
                     const ind = row.querySelector('.indicator');
                     if (ind) { ind.className = `indicator ${p.status}`; ind.innerText = (p.status === 'green' ? '▼' : '▲'); }
-                    const content = row.querySelector('.row-content');
-                    if (content) content.innerHTML = `${p.name}: <b>${p.value}</b>`;
+                    updateElement(row, '.row-content', `${p.name}: <b>${p.value}</b>`);
                     const impact = row.querySelector('.impact-val');
                     if (impact) { impact.className = `impact-val ${p.status}`; impact.innerText = p.impact; }
                 }
@@ -214,41 +256,67 @@
     }
 
     function processEngagement() {
-        findDeep(SETTINGS.categoryBlock).forEach((block, i) => {
-            if (ENGAGEMENT_INSIGHTS[i]) {
-                const d = ENGAGEMENT_INSIGHTS[i];
-                updateElement(block, '.category-name', d.name);
-                updateElement(block, '.visit-pill', `${d.totalInteractions} interactions`);
-                if (d.heatmap && d.heatmap.date) {
-                    const cell = block.querySelector(`.heatmap-cell[title^="${d.heatmap.date}"]`);
-                    if (cell) {
-                        cell.style.backgroundColor = block.querySelector('.category-indicator').style.backgroundColor;
-                        cell.style.opacity = "1.0";
-                        cell.title = `${d.heatmap.date}: ${d.heatmap.count} interactions`;
+        findDeep(SETTINGS.affinityCard).forEach(card => {
+            const headerTitle = card.querySelector('h2.header-title');
+            if (headerTitle && !headerTitle.innerText.includes("*")) {
+                headerTitle.innerHTML = ENGAGEMENT_INSIGHTS_CONFIG.title;
+            }
+            card.querySelectorAll('div.category-block').forEach((block, i) => {
+                const d = ENGAGEMENT_INSIGHTS_CONFIG.categories[i];
+                if (d) {
+                    updateElement(block, '.category-name', d.name);
+                    updateElement(block, '.visit-pill', `${d.totalInteractions} interactions`);
+                    if (d.heatmap && d.heatmap.date) {
+                        const cell = block.querySelector(`.heatmap-cell[title^="${d.heatmap.date}"]`);
+                        if (cell) {
+                            cell.style.backgroundColor = block.querySelector('.category-indicator').style.backgroundColor;
+                            cell.style.opacity = "1.0";
+                            cell.title = `${d.heatmap.date}: ${d.heatmap.count} interactions`;
+                        }
+                    }
+                    const tagEls = block.querySelectorAll('.product-tag');
+                    if (d.products) {
+                        d.products.forEach((p, pi) => {
+                            if (tagEls[pi]) {
+                                updateElement(tagEls[pi], '.product-name', p.name);
+                                updateElement(tagEls[pi], '.product-count', p.count);
+                            }
+                        });
                     }
                 }
-                const tagEls = block.querySelectorAll('.product-tag');
-                if (d.products) d.products.forEach((p, pi) => {
-                    if (tagEls[pi]) { updateElement(tagEls[pi], '.product-name', p.name); updateElement(tagEls[pi], '.product-count', p.count); }
-                });
-            }
+            });
         });
     }
 
     function processActionCards() {
-        findDeep(SETTINGS.cardsGrid).forEach(grid => {
-            grid.querySelectorAll('.action-card').forEach((card, i) => {
-                if (DIRECT_ACTION_CARDS[i]) {
-                    updateElement(card, 'h4', DIRECT_ACTION_CARDS[i].title);
-                    updateElement(card, 'p', DIRECT_ACTION_CARDS[i].description);
-                    updateElement(card, 'a.action-link', `${DIRECT_ACTION_CARDS[i].cta} →`);
+        findDeep(SETTINGS.actionCompID).forEach(host => {
+            const root = host.shadowRoot || host;
+            const childComp = root.querySelector('c-cumulus-client-recommended-actions');
+            const target = (childComp && childComp.shadowRoot) ? childComp.shadowRoot : root;
+            updateElement(target, '.section-label', DIRECT_ACTIONS_CONFIG.title);
+            const cards = findDeep('.action-card', host);
+            cards.forEach((card, i) => {
+                const d = DIRECT_ACTIONS_CONFIG.items[i];
+                if (d) {
+                    updateElement(card, 'h4', d.title);
+                    updateElement(card, 'p', d.description);
+                    updateElement(card, '.action-link', `${d.cta} →`);
                 }
             });
-            grid.querySelectorAll('.journey-card').forEach((card, i) => {
-                if (MARKETING_JOURNEYS[i]) {
-                    updateElement(card, '.journey-tag', MARKETING_JOURNEYS[i].tag);
-                    updateElement(card, 'h3', MARKETING_JOURNEYS[i].title);
-                    updateElement(card, 'p', MARKETING_JOURNEYS[i].description);
+        });
+
+        findDeep(SETTINGS.journeyCompID).forEach(host => {
+            const root = host.shadowRoot || host;
+            const childComp = root.querySelector('c-cumulus-journey-recommendation');
+            const target = (childComp && childComp.shadowRoot) ? childComp.shadowRoot : root;
+            updateElement(target, '.section-label', MARKETING_JOURNEYS_CONFIG.title);
+            const cards = findDeep('.journey-card', host);
+            cards.forEach((card, i) => {
+                const d = MARKETING_JOURNEYS_CONFIG.items[i];
+                if (d) {
+                    updateElement(card, '.journey-tag', d.tag);
+                    updateElement(card, 'h3', d.title);
+                    updateElement(card, 'p', d.description);
                 }
             });
         });
@@ -256,13 +324,14 @@
 
     setInterval(() => {
         try {
+            processClientCard();
             processInsights();
             processSummary();
             processTimeline();
             processHealth();
             processEngagement();
             processActionCards();
-        } catch (e) { /* Fail Silently */ }
+        } catch (e) { /* Silent */ }
     }, SETTINGS.interval);
 
 })();
