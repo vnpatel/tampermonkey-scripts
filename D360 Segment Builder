@@ -1,0 +1,180 @@
+// ==UserScript==
+// @name         D360 Segment Builder
+// @author       Viral Patel
+// @version      1.0
+// @description  Last Updated: April 15, 2026
+// @namespace    http://tampermonkey.net/
+// @match        https://*.lightning.force.com/*
+// @match        https://*.salesforce.com/*
+// @exclude      https://org62.lightning.force.com/*
+// @grant        none
+// @run-at       document-idle
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    // === CONFIGURATION =======================================================
+    const CONFIG = {
+        // SEGMENT TITLE
+        segmentTitle: "**High Net Worth Individual",
+
+        // ATTRIBUTE LABELS
+        labelMap: {
+            "Salutation": "Household Income",
+            "Title": "Executive Level"
+        },
+
+        // POPULATION SEQUENTIAL LOGIC
+        // Note: Initial count (0 clicks) automatically uses totalPopulation.
+        segmentPopulation1: "550,000",
+        segmentPopulation2: "625,000",
+        segmentPopulation3: "710,000",
+        totalPopulation: "1,200,000",
+
+        interval: 300
+    };
+
+    /**********************************************************************
+     * STOP !! STOP !! STOP !! DO NOT EDIT BELOW THIS LINE                *
+     **********************************************************************/
+
+    let refreshClickCount = 0;
+
+    // --- UTILITIES ---
+
+    function findDeep(selector, root = document) {
+        let elements = Array.from(root.querySelectorAll(selector));
+        const all = root.querySelectorAll('*');
+        for (const el of all) {
+            if (el.shadowRoot) elements = elements.concat(findDeep(selector, el.shadowRoot));
+        }
+        return elements;
+    }
+
+    function applyMapping(el, isInput = false) {
+        if (!el) return;
+
+        const currentVal = isInput ? el.value : el.innerText;
+        if (!currentVal) return;
+
+        const trimmedVal = currentVal.trim();
+        const replacement = CONFIG.labelMap[trimmedVal];
+
+        if (replacement) {
+            if (isInput) {
+                el.value = replacement;
+            } else {
+                el.innerText = replacement;
+            }
+            if (el.getAttribute && el.getAttribute('title') === trimmedVal) {
+                el.setAttribute('title', replacement);
+            }
+        }
+    }
+
+    // --- MAIN DESIGNER LOGIC ---
+
+    function processSegmentBuilder() {
+        // 0. Update Main Segment Title
+        if (CONFIG.segmentTitle) {
+            const titleElements = findDeep('[data-tid="page-header-title"]');
+            titleElements.forEach(el => {
+                updateText(el, CONFIG.segmentTitle);
+                if (el.getAttribute('title')) el.setAttribute('title', CONFIG.segmentTitle);
+            });
+        }
+
+        // 1. Target Left Pane (Library) and General Labels
+        const generalTargets = findDeep('.name, .slds-truncate, records-record-layout-item, label');
+        generalTargets.forEach(item => applyMapping(item));
+
+        // 2. Target Canvas Designer Grid (The "Dropped" and "Editing" state)
+        const canvasCells = findDeep('.slds-form-element__static, .slds-text-body_regular, [data-tid="attribute-name"], div[role="gridcell"]');
+        canvasCells.forEach(cell => applyMapping(cell));
+
+        // 3. Target Input Fields in the Edit Form
+        const inputs = findDeep('input[name="subject"]');
+        inputs.forEach(input => applyMapping(input, true));
+
+        // 4. Target Summary Headers (The "Done" state)
+        const summaries = findDeep('[data-tid="condition"]');
+        summaries.forEach(sum => {
+            const label = sum.querySelector('[data-tid="attribute-name"]');
+            if (label) applyMapping(label);
+        });
+    }
+
+    // --- POPULATION LOGIC ---
+
+    function updateText(el, newValue) {
+        if (el && el.innerText.trim() !== newValue) {
+            el.innerText = newValue;
+        }
+    }
+
+    function processPopulation() {
+        // Logic: 0 clicks = totalPopulation, 1 click = segmentPopulation1, etc.
+        let activePop;
+        if (refreshClickCount === 0) {
+            activePop = CONFIG.totalPopulation;
+        } else {
+            const key = `segmentPopulation${refreshClickCount}`;
+            activePop = CONFIG[key] || CONFIG.totalPopulation; // Fallback to total if key not found
+        }
+
+        const currentSeg = parseInt(activePop.replace(/[^0-9]/g, '')) || 0;
+        const currentTotal = parseInt(CONFIG.totalPopulation.replace(/[^0-9]/g, '')) || 0;
+        const percent = Math.round((currentSeg / currentTotal) * 100);
+
+        findDeep('.population-count-label').forEach(el => {
+            if (el.innerText !== activePop) el.innerText = activePop;
+        });
+
+        findDeep('div[data-tid="percent-population"]').forEach(div => {
+            const textEl = div.querySelector('.slds-text-body_small');
+            if (textEl) {
+                const newTxt = `${percent}% of ${CONFIG.totalPopulation} total population`;
+                if (textEl.innerText !== newTxt) textEl.innerText = newTxt;
+            }
+        });
+
+        findDeep('div[data-tid="populationBar"]').forEach(bar => {
+            bar.style.width = `${percent}%`;
+        });
+    }
+
+    function handleRefreshHooking() {
+        const refreshBtns = findDeep('button[title="Recount"], button[title="Calculate Population"], button[data-tid="calculate-filter-population-btn"]');
+        refreshBtns.forEach(btn => {
+            if (!btn.dataset.hooked) {
+                btn.addEventListener('click', () => {
+                    refreshClickCount++;
+                    setTimeout(processPopulation, 400);
+                });
+                btn.dataset.hooked = "true";
+            }
+        });
+    }
+
+    const observer = new MutationObserver(() => {
+        processSegmentBuilder();
+    });
+
+    // --- EXECUTION ---
+
+    setInterval(() => {
+        try {
+            processSegmentBuilder();
+            processPopulation();
+            handleRefreshHooking();
+
+            const workspace = document.querySelector('.windowViewMode-normal');
+            if (workspace && !workspace.dataset.observed) {
+                observer.observe(workspace, { childList: true, subtree: true });
+                workspace.dataset.observed = "true";
+            }
+        } catch (e) {}
+    }, CONFIG.interval);
+
+})();
