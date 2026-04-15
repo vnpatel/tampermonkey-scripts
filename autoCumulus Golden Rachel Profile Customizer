@@ -4,9 +4,9 @@
 // @version      1.1
 // @description  Now with reactive radial dials. Updated April 14, 2026
 // @namespace    http://tampermonkey.net/
-// @match         https://*.lightning.force.com/*
-// @match         https://*.salesforce.com/*
-// @exclude       https://org62.lightning.force.com/*
+// @match        https://*.lightning.force.com/*
+// @match        https://*.salesforce.com/*
+// @exclude      https://org62.lightning.force.com/*
 // @grant        none
 // @run-at       document-idle
 // ==/UserScript==
@@ -24,7 +24,6 @@
         engagement: { label: "Engagement Score", value: "92%" } // Dial will move to 92%
     };
 
-    // ... (Sections 2 through 8 remain as previously configured) ...
 
     // === SECTION 2: SUMMARY BAR ==============================================
     const SUMMARY_METRICS = [
@@ -95,7 +94,7 @@
     };
 
     /**********************************************************************
-     * STOP : STOP : STOP !!!!!!!                                         *
+     * STOP !! STOP !! STOP !! DO NOT EDIT BELOW THIS LINE                *
      **********************************************************************/
 
     const SETTINGS = {
@@ -177,7 +176,6 @@
         });
     }
 
-    // ... (Remaining process functions from previous version) ...
 
     function processInsights() {
         findDeep(SETTINGS.insightCard).forEach(card => {
