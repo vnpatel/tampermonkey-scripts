@@ -2,7 +2,7 @@
 // @name         autoCumulus Golden Rachel Profile Customizer
 // @author       Viral Patel
 // @version      1.1
-// @description  Now with reactive radial dials. Updated April 14, 2026
+// @description  Updated April 15, 2026
 // @namespace    http://tampermonkey.net/
 // @match        https://*.lightning.force.com/*
 // @match        https://*.salesforce.com/*
@@ -18,10 +18,10 @@
     const CLIENT_CARD_CONFIG = {
         name: "*Rachel G Adams",
         loyaltyTier: { label: "Loyalty Tier", value: "*Gold" },
-        lifetimeValue: { label: "Lifetime Relationship Value", value: "$285,476.36" },
+        lifetimeValue: { label: "*Lifetime Relationship Value", value: "$285,476.36" },
         segments: "High Spender; High Net Worth; Under-Insured HNW; Household with Children; Multi-Product Client",
-        attrition: { label: "Attrition Likelihood", value: "75%" }, // Dial will move to 15%
-        engagement: { label: "Engagement Score", value: "92%" } // Dial will move to 92%
+        attrition: { label: "Propensity to Buy", value: "25%" },
+        engagement: { label: "Engagement Score", value: "92%" }
     };
 
 
@@ -34,6 +34,8 @@
     ];
 
     // === SECTION 3: AI INSIGHTS ==============================================
+    // Max 3 AI Insights allowed.
+    // =========================================================================
     const AI_INSIGHTS_CONFIG = {
         title: "*AI Insights",
         items: [
@@ -44,6 +46,8 @@
     };
 
     // === SECTION 4: DIRECT ACTIONS / NBA =====================================
+    // Max 4 Direct Actions allowed.
+    // =========================================================================
     const DIRECT_ACTIONS_CONFIG = {
         title: "*Direct Actions",
         items: [
@@ -55,6 +59,8 @@
     };
 
     // === SECTION 5: JOURNEYS =================================================
+    // Max 2 Journeys allowed.
+    // =========================================================================
     const MARKETING_JOURNEYS_CONFIG = {
         title: "*Strategic Journeys",
         items: [
@@ -64,25 +70,56 @@
     };
 
     // === SECTION 6: ACTIVITY TIMELINE ========================================
+    // Max 7 Activities allowed.
+    // Icon Keys: "Meeting", "Task", "Web", "App", "App-Save", "App-Complete", "Email", "Phone", "Event"
+    // =========================================================================
     const ACTIVITY_TIMELINE_CONFIG = {
         title: "*Activity Timeline",
         items: [
-            { isFuture: true, title: "Send Documents", description: "Task: Outbound quote from RM.", timestamp: "11:59 PM • Apr 22" },
-            { isFuture: true, title: "Retirement Portfolio", description: "Meeting: Face-to-face consultation.", timestamp: "4:00 PM • Tomorrow" },
-            { isFuture: false, title: "Mutual Funds", description: "Web: Explored investing product(s).", timestamp: "Yesterday" }
+            { isFuture: true, icon: "Task", title: "Send Documents", description: "Task: Outbound quote from RM.", timestamp: "11:59 PM • Next Tuesday" },
+            { isFuture: true, icon: "Meeting", title: "Retirement Portfolio", description: "Meeting: Face-to-face consultation.", timestamp: "4:00 PM • Tomorrow" },
+            { isFuture: false, icon: "Email", title: "Application Follow-up", description: "Subject: Complete your application.", timestamp: "1 mins ago" },
+            { isFuture: false, icon: "App-Save", title: "Application: Roth IRA", description: "Status: Application Saved.", timestamp: "4 mins ago" },
+            { isFuture: false, icon: "Web", title: "Roth IRA", description: "Web: Explored investment product(s).", timestamp: "15 mins ago" }
         ]
     };
 
     // === SECTION 7: ENGAGEMENT INSIGHTS ======================================
+    // Max 5 Engagement Insights allowed.
+    // =========================================================================
     const ENGAGEMENT_INSIGHTS_CONFIG = {
         title: "*Engagement Insights",
         categories: [
-            { name: "Insurance", totalInteractions: "85", heatmap: { date: "2026-04-10", count: 12 }, products: [{ name: "Auto Insurance", count: "40" }, { name: "Life Insurance", count: "25" }] },
-            { name: "Banking", totalInteractions: "42", heatmap: { date: "2026-04-13", count: 2 }, products: [{ name: "Standard Checking", count: "20" }, { name: "Standard Savings", count: "16" }] }
+            /*** Start: Category 1 ***/
+            {
+                name: "Insurance",
+                totalInteractions: "85",
+                heatmap: { date: "2026-04-10", count: 12 },
+                /*** Max 2 product tags allowed. ***/
+                products: [
+                    {name: "Auto Insurance", count: "40" },
+                    {name: "Life Insurance", count: "25" }
+                ]
+            },
+            /*** End: Category 1 ***/
+            /*** Start: Category 2 ***/
+            {
+                name: "Banking",
+                totalInteractions: "42",
+                heatmap: { date: "2026-04-13", count: 2 },
+                /*** Max 2 product tags allowed. ***/
+                products: [
+                    { name: "Standard Checking", count: "20" },
+                    { name: "Standard Savings", count: "16" }
+                ]
+            }
+            /*** End: Category 2 ***/
         ]
     };
 
     // === SECTION 8: RELATIONSHIP HEALTH ======================================
+    // Max 3 Predictors allowed.
+    // =========================================================================
     const RELATIONSHIP_HEALTH_METRICS = {
         title: "Attrition Likelihood",
         probability: "15%",
@@ -96,6 +133,19 @@
     /**********************************************************************
      * STOP !! STOP !! STOP !! DO NOT EDIT BELOW THIS LINE                *
      **********************************************************************/
+
+    // ICON SVGs: ** Do NOT Edit unless you know how this works **
+    const ICON_LOOKUP = {
+        "Meeting": { class: "bg-meeting", svg: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2222%22%20height%3D%2222%22%20fill%3D%22none%22%20stroke%3D%22%238b5cf6%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M17%2021v-2a4%204%200%200%200-4-4H5a4%204%200%200%200-4%204v2%22%3E%3C%2Fpath%3E%3Ccircle%20cx%3D%229%22%20cy%3D%227%22%20r%3D%224%22%3E%3C%2Fcircle%3E%3Cpath%20d%3D%22M23%2021v-2a4%204%200%200%200-3-3.87%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M16%203.13a4%204%200%200%201%200%207.75%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E" },
+        "Task": { class: "bg-task", svg: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2222%22%20height%3D%2222%22%20fill%3D%22none%22%20stroke%3D%22%23f59e0b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M9%205H7a2%202%200%2000-2%202v12a2%202%200%20002%202h10a2%202%200%20002-2V7a2%202%200%2000-2-2h-2%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M9%205a2%202%200%20002%202h2a2%202%200%20002-2%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M9%205a2%202%200%20012-2h2a2%202%200%20012%202%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M9%2014l2%202%204-4%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E" },
+        "Web": { class: "bg-web", svg: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2222%22%20height%3D%2222%22%20fill%3D%22none%22%20stroke%3D%22%234c80f1%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%2210%22%3E%3C%2Fcircle%3E%3Cline%20x1%3D%222%22%20y1%3D%2212%22%20x2%3D%2222%22%20y2%3D%2212%22%3E%3C%2Fline%3E%3Cpath%20d%3D%22M12%202a15.3%2015.3%200%20014%2010%2015.3%2015.3%200%2001-4%2010%2015.3%2015.3%200%2001-4-10%2015.3%2015.3%200%20014-10z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E" },
+        "App": { class: "bg-app", svg: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2222%22%20height%3D%2222%22%20fill%3D%22none%22%20stroke%3D%22%23f97316%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M11%204H4a2%202%200%2000-2%202v14a2%202%200%20002%202h14a2%202%200%20002-2v-7%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M18.5%202.5a2.121%202.121%200%20013%203L12%2015l-4%201%201-4%209.5-9.5z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E" },
+        "App-Save": { class: "bg-appSave", svg: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2222%22%20height%3D%2222%22%20fill%3D%22none%22%20stroke%3D%22%23f97316%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M19%2021H5a2%202%200%2001-2-2V5a2%202%200%20012-2h11l5%205v11a2%202%200%2001-2%202z%22%3E%3C%2Fpath%3E%3Cpolyline%20points%3D%2217%2021%2017%2013%207%2013%207%2021%22%3E%3C%2Fpolyline%3E%3Cpolyline%20points%3D%227%203%207%208%2015%208%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E" },
+        "App-Complete": { class: "bg-appComplete", svg: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2222%22%20height%3D%2222%22%20fill%3D%22none%22%20stroke%3D%22%2310b981%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M22%2011.08V12a10%2010%200%2011-5.93-9.14%22%3E%3C%2Fpath%3E%3Cpolyline%20points%3D%2222%204%2012%2014.01%209%2011.01%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E" },
+        "Email": { class: "bg-email", svg: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2222%22%20height%3D%2222%22%20fill%3D%22none%22%20stroke%3D%22%232bb673%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M4%204h16c1.1%200%202%20.9%202%202v12c0%201.1-.9%202-2%202H4c-1.1%200-2-.9-2-2V6c0-1.1.9-2%202-2z%22%3E%3C%2Fpath%3E%3Cpolyline%20points%3D%2222%2C6%2012%2C13%202%2C6%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E" },
+        "Phone": { class: "bg-phone", svg: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2222%22%20height%3D%2222%22%20fill%3D%22none%22%20stroke%3D%22%23f59e0b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M22%2016.92v3a2%202%200%2001-2.18%202%2019.79%2019.79%200%2001-8.63-3.07%2019.5%2019.5%200%2001-6-6%2019.79%2019.79%200%2001-3.07-8.67A2%202%200%20014.11%202h3a2%202%200%20012%201.72c.127.96.361%201.903.7%202.81a2%202%200%2001-.45%202.11L8.09%209.91a16%2016%200%20006%206l1.27-1.27a2%202%200%20012.11-.45c.907.339%201.85.573%202.81.7A2%202%200%200122%2016.92z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E" },
+        "Event": { class: "bg-event", svg: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2222%22%20height%3D%2222%22%20fill%3D%22none%22%20stroke%3D%22%23ec4899%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20viewBox%3D%220%200%2024%2024%22%3E%3Crect%20x%3D%223%22%20y%3D%224%22%20width%3D%2218%22%20height%3D%2218%22%20rx%3D%222%22%20ry%3D%222%22%3E%3C%2Frect%3E%3Cline%20x1%3D%2216%22%20y1%3D%222%22%20x2%3D%2216%22%20y2%3D%226%22%3E%3C%2Fline%3E%3Cline%20x1%3D%228%22%20y1%3D%222%22%20x2%3D%228%22%20y2%3D%226%22%3E%3C%2Fline%3E%3Cline%20x1%3D%223%22%20y1%3D%2210%22%20x2%3D%2221%22%20y2%3D%2210%22%3E%3C%2Fline%3E%3C%2Fsvg%3E" }
+    };
 
     const SETTINGS = {
         clientCardHost: 'c-cumulus-client-card',
@@ -222,6 +272,23 @@
                 if (d.isFuture) item.classList.add('future-item'); else item.classList.remove('future-item');
                 updateElement(item, '.activity-name', d.title);
                 updateElement(item, '.activity-details', d.description);
+
+                // Start: Handle Icon logic
+                if (d.icon && ICON_LOOKUP[d.icon]) {
+                    const iconContainer = item.querySelector('.icon-container');
+                    const iconImg = item.querySelector('.timeline-icon-img');
+                    const lookup = ICON_LOOKUP[d.icon];
+
+                    if (iconContainer) {
+                        iconContainer.className = iconContainer.className.replace(/\bbg-\w+\b/g, '').trim();
+                        iconContainer.classList.add(lookup.class);
+                    }
+                    if (iconImg) {
+                        iconImg.src = lookup.svg;
+                    }
+                }
+                // End: Handle Icon logic
+
                 const timeSpan = item.querySelector('.timestamp');
                 if (timeSpan && d.timestamp) {
                     const clock = timeSpan.querySelector('svg.clock-icon');
