@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         autoCumulus Golden Rachel Profile Customizer
 // @author       Viral Patel
-// @version      1.1
-// @description  Updated April 15, 2026
+// @version      1.2
+// @description  Updated April 27, 2026
 // @namespace    http://tampermonkey.net/
 // @match        https://*.lightning.force.com/*
 // @match        https://*.salesforce.com/*
@@ -46,19 +46,41 @@
     };
 
     // === SECTION 4: DIRECT ACTIONS / NBA =====================================
-    // Max 4 Direct Actions allowed.
+    // Max 2 Direct Actions allowed.
     // =========================================================================
     const DIRECT_ACTIONS_CONFIG = {
         title: "*Direct Actions",
         items: [
             { title: "*Increase 401K Contributions", description: "Maximize contributions to close the retirement savings gap.", cta: "Discuss Options" },
-            { title: "*Explore High Yield Savings", description: "Transition idle cash to a high yield savings account for better returns.", cta: "Present Offer" },
-            { title: "*Review Student Loan Options", description: "Investigate refinancing options to reduce monthly payments.", cta: "Discuss Options" },
-            { title: "*Mutual Fund Selection", description: "Professional fund management across diverse asset classes.", cta: "View Funds" }
+            { title: "*Explore High Yield Savings", description: "Transition idle cash to a high yield savings account for better returns.", cta: "Present Offer" }
         ]
     };
 
-    // === SECTION 5: JOURNEYS =================================================
+    // === SECTION 5: PERSONALIZED OFFERS (RTOM) =============================
+    // Max 2 Offers allowed.
+    // TO-DO: These offer details do NOT propogate down to "Present Offer" modal + activity timeline.
+    // =========================================================================
+    const PERSONALIZED_OFFERS_CONFIG = {
+        badge: "*Elite Member Affinity",
+        viewedCounter: "15 offers viewed",
+        impCounter: "500 impressions (7d)",
+        offers: [
+            {
+                eyebrow: "*EXECUTIVE BENEFITS",
+                headline: "*Tax-Free Wealth Transfer Strategy",
+                subline: "Protect your legacy with our specialized estate preservation tools.",
+                viewed: "Viewed 12x"
+            },
+            {
+                eyebrow: "*EXCLUSIVE ACCESS",
+                headline: "*Private Equity Fund III",
+                subline: "Direct access to late-stage technology ventures for qualified investors.",
+                viewed: "Viewed 5x"
+            }
+        ]
+    };
+
+    // === SECTION 6: JOURNEYS =================================================
     // Max 2 Journeys allowed.
     // =========================================================================
     const MARKETING_JOURNEYS_CONFIG = {
@@ -69,7 +91,7 @@
         ]
     };
 
-    // === SECTION 6: ACTIVITY TIMELINE ========================================
+    // === SECTION 7: ACTIVITY TIMELINE ========================================
     // Max 7 Activities allowed.
     // Icon Keys: "Meeting", "Task", "Web", "App", "App-Save", "App-Complete", "Email", "Phone", "Event"
     // =========================================================================
@@ -78,13 +100,13 @@
         items: [
             { isFuture: true, icon: "Task", title: "Send Documents", description: "Task: Outbound quote from RM.", timestamp: "11:59 PM • Next Tuesday" },
             { isFuture: true, icon: "Meeting", title: "Retirement Portfolio", description: "Meeting: Face-to-face consultation.", timestamp: "4:00 PM • Tomorrow" },
-            { isFuture: false, icon: "Email", title: "Application Follow-up", description: "Subject: Complete your application.", timestamp: "1 mins ago" },
-            { isFuture: false, icon: "App-Save", title: "Application: Roth IRA", description: "Status: Application Saved.", timestamp: "4 mins ago" },
-            { isFuture: false, icon: "Web", title: "Roth IRA", description: "Web: Explored investment product(s).", timestamp: "15 mins ago" }
+            { isFuture: false, icon: "App-Save", title: "Application Saved", description: "Your application has been saved!", timestamp: "1 mins ago" },
+            { isFuture: false, icon: "App-Complete", title: "Application: Crypto", description: "Status: Application Saved.", timestamp: "4 mins ago" },
+            { isFuture: false, icon: "Web", title: "Bitcoin IRA", description: "Web: Explored crypto product(s).", timestamp: "15 mins ago" }
         ]
     };
 
-    // === SECTION 7: ENGAGEMENT INSIGHTS ======================================
+    // === SECTION 8: ENGAGEMENT INSIGHTS ======================================
     // Max 5 Engagement Insights allowed.
     // =========================================================================
     const ENGAGEMENT_INSIGHTS_CONFIG = {
@@ -104,27 +126,27 @@
             /*** End: Category 1 ***/
             /*** Start: Category 2 ***/
             {
-                name: "Banking",
+                name: "Crypto",
                 totalInteractions: "42",
-                heatmap: { date: "2026-04-13", count: 2 },
+                heatmap: { date: "2026-04-22", count: 25 },
                 /*** Max 2 product tags allowed. ***/
                 products: [
-                    { name: "Standard Checking", count: "20" },
-                    { name: "Standard Savings", count: "16" }
+                    { name: "Bitcoin", count: "20" },
+                    { name: "Ethereum", count: "5" }
                 ]
             }
             /*** End: Category 2 ***/
         ]
     };
 
-    // === SECTION 8: RELATIONSHIP HEALTH ======================================
+    // === SECTION 9: RELATIONSHIP HEALTH ======================================
     // Max 3 Predictors allowed.
     // =========================================================================
     const RELATIONSHIP_HEALTH_METRICS = {
         title: "Attrition Likelihood",
         probability: "15%",
         predictors: [
-            { status: "green", name: "Has Goals", value: "Yes", impact: "-10.8%" },
+            { status: "red", name: "No Engagement", value: "Yes", impact: "-10.8%" },
             { status: "red", name: "Tenure", value: "20.9 Yrs", impact: "+6.5%" },
             { status: "green", name: "Yearly Income", value: "$202,053", impact: "-12.8%" }
         ]
@@ -156,6 +178,7 @@
         affinityCard: '.affinity-card',
         actionCompID: '[data-component-id="c_cumulusClientRecommendedActions"]',
         journeyCompID: '[data-component-id="c_cumulusJourneyRecommendation"]',
+        offerCompHost: 'c-cumulus-r-t-o-m',
         summaryBar: 'div.summary-bar',
         interval: 2000
     };
@@ -353,6 +376,39 @@
         });
     }
 
+    function processOffers() {
+        const hosts = findDeep(SETTINGS.offerCompHost);
+        hosts.forEach(host => {
+            const root = host.shadowRoot || host;
+            const config = PERSONALIZED_OFFERS_CONFIG;
+
+            // Update Badge and Counters
+            updateElement(root, '.affinity-badge', config.badge);
+
+            const counters = root.querySelectorAll('.impressions-counter');
+            if(counters.length >= 2) {
+                if(counters[0].innerHTML !== config.viewedCounter) counters[0].innerHTML = config.viewedCounter;
+                if(counters[1].innerHTML !== config.impCounter) counters[1].innerHTML = config.impCounter;
+            }
+
+            // Update Offer Cards (Max 2)
+            const offerWrappers = root.querySelectorAll('.offer-wrapper');
+            offerWrappers.forEach((wrapper, i) => {
+                if (i >= 2) return;
+                const d = config.offers[i];
+                if (d) {
+                    updateElement(wrapper, '.modern-eyebrow', d.eyebrow);
+                    updateElement(wrapper, '.modern-headline', d.headline);
+                    updateElement(wrapper, '.modern-sub', d.subline);
+
+                    // Targeted search for the "Viewed" text span
+                    const viewedSpan = Array.from(wrapper.querySelectorAll('span')).find(s => s.innerText.includes('Viewed'));
+                    if(viewedSpan) viewedSpan.innerHTML = d.viewed;
+                }
+            });
+        });
+    }
+
     function processActionCards() {
         findDeep(SETTINGS.actionCompID).forEach(host => {
             const root = host.shadowRoot || host;
@@ -396,6 +452,7 @@
             processHealth();
             processEngagement();
             processActionCards();
+            processOffers();
         } catch (e) { /* Silent */ }
     }, SETTINGS.interval);
 
