@@ -1,0 +1,231 @@
+// ==UserScript==
+// @name         Cumulus Website Homepage - Responsive Mobile Fix
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  Full Fix: Restores alignment, forces Hero H1 to single-line truncation.
+// @author       Viral Patel
+// @match        https://cumulusfinserv-ad61ddfc9e8c.herokuapp.com/*
+// @grant        GM_addStyle
+// @run-at       document-idle
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    GM_addStyle(`
+    @media (max-width: 768px) {
+        /* --- SECTION 1: TOP NAVIGATION CLEANUP --- */
+        #vp-category-menu, .category-menu {
+            display: none !important;
+            height: 0 !important;
+            visibility: hidden !important;
+        }
+
+        #vp-navbar, .navbar-inverse {
+            position: relative !important;
+            top: 0 !important;
+            display: block !important;
+            background: #ffffff !important;
+            border-bottom: 1px solid #ddd !important;
+            margin-bottom: 0 !important;
+            z-index: 1000 !important;
+        }
+
+        .navContainer {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            width: 100% !important;
+            padding: 5px 15px !important;
+        }
+
+        .navContainer img {
+            max-width: 110px !important;
+            margin: 5px !important;
+        }
+
+        /* --- SECTION 2: LOGIN & WAFFLE ALIGNMENT --- */
+        .pull-right {
+            float: none !important;
+            display: flex !important;
+            align-items: center !important;
+            position: relative !important;
+            flex: 1 !important;
+            justify-content: flex-end !important;
+        }
+
+        .login.blue-btn {
+            position: absolute !important;
+            right: 100px !important;
+            margin: 0 !important;
+            padding: 6px 15px !important;
+            font-size: 12px !important;
+            background-color: #0070d2 !important;
+            color: #fff !important;
+            height: 34px !important;
+            display: flex !important;
+            align-items: center !important;
+            white-space: nowrap !important;
+            border-radius: 4px !important;
+            z-index: 2 !important;
+        }
+
+        #nav-expander {
+            position: relative !important;
+            margin: 0 !important;
+            color: #333 !important;
+            height: 34px !important;
+            width: 34px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 0 !important;
+            font-size: 18px !important;
+            background: #eee !important;
+            border-radius: 4px !important;
+            text-decoration: none !important;
+            z-index: 1 !important;
+        }
+
+        #nav-expander .glyphicon {
+            top: 0 !important;
+            margin: 0 !important;
+            position: relative !important;
+        }
+
+        #vp-navbar .navbar-nav.navbar-left {
+            display: none !important;
+        }
+
+        /* --- SECTION 3: RESPONSIVE HERO BANNER --- */
+        .hero-content-overlay {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            pointer-events: none !important;
+        }
+
+        .hero-content-overlay .container {
+            width: 100% !important;
+            padding: 0 20px !important;
+            margin: 0 !important;
+        }
+
+        .hero-content-overlay .container > div {
+            padding-left: 0 !important;
+            text-align: left !important;
+            max-width: 100% !important;
+            overflow: hidden !important;
+        }
+
+        /* NUCLEAR SPECIFICITY FOR H1 - Forced to one line with truncation */
+        #vp-hero-container #vp-hero-inner .container div h1,
+        div#vp-hero-inner h1[style*="font-size"] {
+            font-size: 24px !important;
+            line-height: 1.1 !important;
+            text-align: left !important;
+            margin: 0 0 8px 0 !important;
+            color: #FFFFFF !important;
+            text-shadow: none !important;
+            font-family: 'Raleway', sans-serif !important;
+
+            /* FORCE ONE LINE & CHOP */
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important; /* Adds '...' if chopped */
+            display: block !important;
+            max-width: 90vw !important; /* Prevents it from pushing off screen */
+        }
+
+        /* NUCLEAR SPECIFICITY FOR P */
+        #vp-hero-container #vp-hero-inner .container div p,
+        div#vp-hero-inner p[style*="font-size"] {
+            font-size: 16px !important;
+            line-height: 1.2 !important;
+            text-align: left !important;
+            margin: 0 0 18px 0 !important;
+            font-weight: bold !important;
+            color: #FFFFFF !important;
+            text-shadow: none !important;
+        }
+
+        #vp-hero-inner .green-btn {
+            display: inline-block !important;
+            pointer-events: auto !important;
+            padding: 10px 22px !important;
+            font-size: 14px !important;
+            border-radius: 20px !important;
+        }
+
+        #hp-banner-image {
+            height: 440px !important;
+            object-fit: cover !important;
+            object-position: 15% center !important;
+        }
+        /* --- SECTION 4: OFFERS SECTION ALIGNMENT --- */
+
+        /* 1. Center the 'Your Financial Journey' eyebrow */
+        #vp-offer-content .text-center h5 {
+            text-align: center !important;
+            width: 100% !important;
+            display: block !important;
+        }
+
+        /* 2. Center the 'Personalized offers just for you' main header */
+        /* Note: Your HTML uses a col-md-8 col-md-offset-2 wrapper which helps,
+           but we force the internal h2 and the flex container to center */
+        #hp-offers-title {
+            text-align: center !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            width: 100% !important;
+        }
+
+        /* Ensure the row containing the header is a flex-center if necessary */
+        #vp-offer-content .row {
+            display: flex !important;
+            justify-content: center !important;
+            text-align: center !important;
+        }
+
+
+        /* --- SECTION 5: BLOGS & INSIGHTS CENTERING --- */
+
+        /* 1. Center the "We are here to help" headers */
+        #homepage-recommendations .col-md-8 {
+            text-align: center !important;
+            float: none !important;
+            margin: 0 auto !important;
+        }
+
+        /* 2. Center each blog card "outer box" on mobile */
+        /* We set them to display as inline-blocks and center the parent row */
+        #homepage-recommendations .row {
+            text-align: center !important;
+            display: block !important;
+        }
+
+        #homepage-recommendations .col-sm-3 {
+            float: none !important;
+            display: inline-block !important;
+            vertical-align: top !important;
+            margin: 0 auto 30px auto !important; /* Centers the box and adds bottom spacing */
+            width: 90% !important; /* Makes the box prominent on mobile */
+            max-width: 350px !important;
+        }
+
+        /* 3. Center the "Life Simplified" section at the bottom */
+        #vp-intro-content .container:last-child .col-md-8 {
+            text-align: center !important;
+            float: none !important;
+            margin: 0 auto !important;
+        }
+    }
+    `);
+})();
