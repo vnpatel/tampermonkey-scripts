@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         autoCumulus Golden Rachel Profile Customizer
 // @author       Viral Patel
-// @version      1.2
-// @description  Updated April 27, 2026
+// @version      1.3
+// @description  Updated April 30, 2026
 // @namespace    http://tampermonkey.net/
 // @match        https://*.lightning.force.com/*
 // @match        https://*.salesforce.com/*
@@ -14,9 +14,27 @@
 (function() {
     'use strict';
 
+    // === SECTION 0: GLOBAL TEXT REPLACEMENTS ================================
+    // Use 'regex' for complex patterns or 'string' for simple ones.
+    // \b is a word boundary (prevents matching "McDonalds" when looking for "CD").
+    // =========================================================================
+    const GLOBAL_REPLACEMENTS = [
+        [/401K/gi, "RRSP"],
+        [/Traditional IRA/g, "RRSP"],
+        [/Roth IRA/g, "TFSA"],
+        [/\bIRA\b/g, "RRSP"],
+        [/\bCD\b/g, "GIC"],
+        [/\bCDs\b/g, "GICs"],
+    ];
+
     // === SECTION 1: CLIENT CARD ==============================================
     const CLIENT_CARD_CONFIG = {
         name: "*Rachel G Adams",
+        phone: "+1 (905) 555-4488",
+        address: {
+            street: "547 35th Street",
+            cityStateZip: "Toronto, ON L2A 3P3"
+        },
         loyaltyTier: { label: "Loyalty Tier", value: "*Gold" },
         lifetimeValue: { label: "*Lifetime Relationship Value", value: "$285,476.36" },
         segments: "High Spender; High Net Worth; Under-Insured HNW; Household with Children; Multi-Product Client",
@@ -218,6 +236,29 @@
             updateElement(root, '.loyalty-tier', `${config.loyaltyTier.label}: ${config.loyaltyTier.value}`);
             updateElement(root, '.m-lbl', config.lifetimeValue.label);
             updateElement(root, '.m-val', config.lifetimeValue.value);
+            const rows = root.querySelectorAll('.c-row');
+            rows.forEach(row => {
+                const glyph = row.querySelector('.glyph');
+                const valEl = row.querySelector('.c-val');
+                if (!glyph || !valEl) return;
+
+                const glyphText = glyph.innerHTML;
+
+                // Handle Phone Number
+                if (glyphText.includes('☎')) {
+                    if (valEl.innerHTML !== config.phone) {
+                        valEl.innerHTML = config.phone;
+                    }
+                }
+
+                // Handle Address
+                if (glyphText.includes('➤')) {
+                    const newAddressHTML = `${config.address.street}<br lwc-3fg9posavp6="">${config.address.cityStateZip}`;
+                    if (valEl.innerHTML !== newAddressHTML) {
+                        valEl.innerHTML = newAddressHTML;
+                    }
+                }
+            });
 
             // Reactive Dials (Radial Metrics)
             const attrition = root.querySelector('[data-id="attrition"]');
@@ -443,6 +484,60 @@
         });
     }
 
+    // Use a WeakSet to keep track of nodes we've already modified
+    // to prevent infinite loops or redundant processing.
+    const processedNodes = new WeakSet();
+
+    function replaceInNode(node) {
+        // Only look for text nodes
+        const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, {
+            acceptNode: function(n) {
+                // Skip text inside script and style tags
+                if (n.parentNode && ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(n.parentNode.tagName)) {
+                    return NodeFilter.FILTER_REJECT;
+                }
+                return NodeFilter.FILTER_ACCEPT;
+            }
+        }, false);
+
+        let textNode;
+        while (textNode = walker.nextNode()) {
+            // If we've already touched this node, skip it
+            if (processedNodes.has(textNode)) continue;
+
+            let text = textNode.nodeValue;
+            let modified = false;
+
+            // NEW WAY (Looking for index 0 and index 1)
+            GLOBAL_REPLACEMENTS.forEach(([findTerm, replaceTerm]) => {
+                if (findTerm.test(text)) {
+                    text = text.replace(findTerm, replaceTerm);
+                    modified = true;
+                }
+            });
+
+            if (modified) {
+                textNode.nodeValue = text;
+                processedNodes.add(textNode); // Mark as done
+            }
+        }
+    }
+
+    function processGlobalReplacements(root = document) {
+        // Process the current root
+        replaceInNode(root);
+
+        // Find elements with shadow roots
+        // Optimization: only check elements that might actually have a shadowRoot
+        const allElements = root.querySelectorAll('*');
+        for (let i = 0; i < allElements.length; i++) {
+            const el = allElements[i];
+            if (el.shadowRoot) {
+                processGlobalReplacements(el.shadowRoot);
+            }
+        }
+    }
+
     setInterval(() => {
         try {
             processClientCard();
@@ -453,6 +548,7 @@
             processEngagement();
             processActionCards();
             processOffers();
+            processGlobalReplacements();
         } catch (e) { /* Silent */ }
     }, SETTINGS.interval);
 
