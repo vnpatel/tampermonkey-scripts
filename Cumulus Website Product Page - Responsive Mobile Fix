@@ -1,0 +1,93 @@
+// ==UserScript==
+// @name         Cumulus Website Product Page - Responsive Mobile Fix
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  Uniform left-alignment for Banking/Insurance product pages with fixed Sidebar and Image alignment
+// @author       Viral Patel
+// @match        https://cumulusfinserv-ad61ddfc9e8c.herokuapp.com/banking*
+// @match        https://cumulusfinserv-ad61ddfc9e8c.herokuapp.com/insurance*
+// @match        https://cumulusfinserv-ad61ddfc9e8c.herokuapp.com/investing*
+// @match        https://cumulusfinserv-ad61ddfc9e8c.herokuapp.com/borrowing*
+// @match        https://cumulusfinserv-ad61ddfc9e8c.herokuapp.com/credit-cards*
+// @grant        GM_addStyle
+// @run-at       document-idle
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    GM_addStyle(`
+    @media (max-width: 768px) {
+        /* 1. FORCE UNIFORM LEFT GUTTER */
+        .container {
+            margin-left: 0 !important;
+            margin-right: auto !important;
+            padding-left: 20px !important;
+            padding-right: 20px !important; /* Added to ensure right-side breathing room */
+            width: 100% !important;
+        }
+
+        /* 2. STACK AND LEFT-ALIGN ALL BLOCKS */
+        .product-intro .row,
+        .product-details .row,
+        .product-body .row,
+        .advertisements .row {
+            display: block !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        /* 3. RESET COLUMN BEHAVIOR */
+        [class*="col-"] {
+            width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important; /* Resetting this to let container handle outer padding */
+            margin-bottom: 25px !important;
+            float: none !important;
+            text-align: left !important;
+            margin-left: 0 !important;
+        }
+
+        /* 4. PDP IMAGE FIX - Perfectly Left Aligned */
+        .pdp-img-responsive {
+            max-width: 260px !important;
+            height: auto !important;
+            margin-bottom: 20px !important;
+            margin-left: 0 !important; /* Force to absolute start */
+            display: block !important;
+        }
+
+        /* 5. SIDEBAR UNIFORMITY */
+        /* Applying internal padding so text doesn't hit the border/edge */
+        .sidebar {
+            background: transparent !important;
+            border: 1px solid #eee !important; /* Changed to full border for better definition */
+            padding: 20px !important; /* Uniform internal padding (Top, Right, Bottom, Left) */
+            margin-top: 20px !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            border-radius: 8px !important;
+        }
+
+        /* 6. TYPOGRAPHY CLEANUP */
+        h1, h2, h3, h4, h5, p, ul {
+            text-align: left !important;
+            margin-left: 0 !important;
+        }
+
+        .extraColPadding {
+            padding-left: 0 !important;
+        }
+
+        /* Ensure bullets have proper indentation */
+        ul {
+            padding-left: 18px !important;
+        }
+
+        hr {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+    }
+    `);
+})();
